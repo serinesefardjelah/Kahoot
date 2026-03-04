@@ -109,6 +109,13 @@ src/
 | `npm test`     | Tests unitaires (Karma + Jasmine)  |
 | `npm run lint` | Analyse statique du code (ESLint)  |
 
+Avant chaque commit, vérifier que tout passe :
+
+```bash
+npm run lint      # vérifie les règles ESLint
+npm run build     # vérifie que tout compile
+```
+
 ---
 
 ## Technologies utilisées

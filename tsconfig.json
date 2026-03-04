@@ -19,8 +19,7 @@
     "target": "es2022",
     "module": "es2020",
     "skipLibCheck": true,
-    "useDefineForClassFields": false,
-    "types": []
+    "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -29,8 +28,7 @@
     "strictTemplates": true
   },
   "references": [
-    {
-      "path": "cypress/tsconfig.json"
-    }
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.spec.json" }
   ]
 }
