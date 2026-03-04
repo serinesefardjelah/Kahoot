@@ -44,11 +44,11 @@ import {
 } from 'ionicons/icons';
 import { Router, RouterLink } from '@angular/router';
 import { Quiz } from '../models/quiz';
-import { CreateQuizModal } from '../modals/create-quiz.modal';
-import { PageHeader } from '../components/page-header';
+import { CreateQuizModalComponent } from '../modals/create-quiz.modal';
+import { PageHeaderComponent } from '../components/page-header';
 
 @Component({
-  selector: 'quiz-options-popover',
+  selector: 'app-quiz-options-popover',
   template: `
     <ion-content class="ion-padding">
       <ion-list>
@@ -65,7 +65,7 @@ import { PageHeader } from '../components/page-header';
   `,
   imports: [IonContent, IonList, IonItem, IonIcon, IonLabel],
 })
-export class QuizOptionsPopover {
+export class QuizOptionsPopoverComponent {
   popoverCtrl = inject(PopoverController);
 
   constructor() {
@@ -82,7 +82,7 @@ export class QuizOptionsPopover {
 }
 
 @Component({
-  selector: 'quiz-page-toolbar',
+  selector: 'app-quiz-page-toolbar',
   template: `
     <ion-toolbar>
       <ion-title>
@@ -125,7 +125,7 @@ export class QuizOptionsPopover {
     Field,
   ],
 })
-export class QuizPageToolbar {
+export class QuizPageToolbarComponent {
   popoverCtrl = inject(PopoverController);
   quizForm = input.required<FieldTree<Quiz, string | number>>();
 
@@ -138,7 +138,7 @@ export class QuizPageToolbar {
 
   async openOptions(event: Event) {
     const popover = await this.popoverCtrl.create({
-      component: QuizOptionsPopover,
+      component: QuizOptionsPopoverComponent,
       event,
       translucent: true,
     });
@@ -156,26 +156,26 @@ export class QuizPageToolbar {
 }
 
 @Component({
-  selector: 'quiz',
+  selector: 'app-quiz',
   template: `
     @let quiz = this.quiz();
 
-    <page-header [translucent]="true">
-      <quiz-page-toolbar
+    <app-page-header [translucent]="true">
+      <app-quiz-page-toolbar
         [quizForm]="quizForm"
         (delete)="deleteQuiz()"
         (edit)="editQuiz()"
       />
-    </page-header>
+    </app-page-header>
 
     <ion-content [fullscreen]="true">
-      <page-header collapse="condense">
-        <quiz-page-toolbar
+      <app-page-header collapse="condense">
+        <app-quiz-page-toolbar
           [quizForm]="quizForm"
           (delete)="deleteQuiz()"
           (edit)="editQuiz()"
         />
-      </page-header>
+      </app-page-header>
 
       <div id="container">
         <ion-list lines="none">
@@ -205,8 +205,8 @@ export class QuizPageToolbar {
     IonItem,
     IonLabel,
     Field,
-    QuizPageToolbar,
-    PageHeader,
+    QuizPageToolbarComponent,
+    PageHeaderComponent,
   ],
 })
 export class QuizPage {
@@ -215,11 +215,11 @@ export class QuizPage {
   private readonly actionSheetCtrl = inject(ActionSheetController);
   private readonly router = inject(Router);
 
-  readonly id = input.required<string>({ alias: 'quizId' });
+  readonly quizId = input.required<string>();
 
   protected readonly quizResource = rxResource({
     stream: ({ params }) => this.quizService.getById(params.id),
-    params: () => ({ id: this.id() }),
+    params: () => ({ id: this.quizId() }),
     defaultValue: {
       id: '',
       title: '',
@@ -249,7 +249,7 @@ export class QuizPage {
 
   async editQuiz() {
     const modalRef = await this.modalCtrl.create({
-      component: CreateQuizModal,
+      component: CreateQuizModalComponent,
       componentProps: { quiz: this.quiz },
       cssClass: 'fullscreen-modal',
     });
@@ -281,7 +281,7 @@ export class QuizPage {
     const { role } = await actionSheet.onWillDismiss();
 
     if (role === 'confirm') {
-      await this.quizService.deleteQuiz(this.id());
+      await this.quizService.deleteQuiz(this.quizId());
       this.router.navigateByUrl('/');
     }
   }

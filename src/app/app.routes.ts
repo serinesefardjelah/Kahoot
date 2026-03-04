@@ -18,7 +18,7 @@ export const routes: Routes = [
   {
     path: '',
     canActivate: [isAuthenticated],
-    loadComponent: () => import('./main.component').then((m) => m.Main),
+    loadComponent: () => import('./main.component').then((m) => m.MainComponent),
     children: [
       {
         path: 'quizzes',

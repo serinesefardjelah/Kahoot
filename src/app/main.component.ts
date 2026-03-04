@@ -24,7 +24,7 @@ import { gameControllerOutline, playCircle } from 'ionicons/icons';
   </ion-tabs>`,
   imports: [IonIcon, IonTabBar, IonTabButton, IonTabs],
 })
-export class Main {
+export class MainComponent {
   constructor() {
     addIcons({ gameControllerOutline, playCircle });
   }

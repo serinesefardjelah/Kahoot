@@ -15,7 +15,7 @@ import { playOutline } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 
 @Component({
-  selector: 'quiz-card',
+  selector: 'app-quiz-card',
   template: `
     @let quiz = this.quiz();
     <ion-card [routerLink]="'/quiz/' + quiz.id">
@@ -49,7 +49,7 @@ import { addIcons } from 'ionicons';
     TitleCasePipe,
   ],
 })
-export class QuizCard {
+export class QuizCardComponent {
   readonly quiz = input.required<Quiz>();
 
   constructor() {

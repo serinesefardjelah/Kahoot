@@ -14,19 +14,19 @@ import {
   ModalController,
 } from '@ionic/angular/standalone';
 import { QuizService } from '../services/quiz.service';
-import { QuizCard } from '../components/quiz.card';
+import { QuizCardComponent } from '../components/quiz.card';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
-import { CreateQuizModal } from '../modals/create-quiz.modal';
-import { PageHeader } from '../components/page-header';
+import { CreateQuizModalComponent } from '../modals/create-quiz.modal';
+import { PageHeaderComponent } from '../components/page-header';
 
 @Component({
-  selector: 'quiz-list',
+  selector: 'app-quiz-list',
   template: `
-    <page-header [translucent]="true">Home</page-header>
+    <app-page-header [translucent]="true">Home</app-page-header>
 
     <ion-content [fullscreen]="true">
-      <page-header collapse="condense">Home</page-header>
+      <app-page-header collapse="condense">Home</app-page-header>
 
       <div id="container">
         @let quizzes = this.quizzes.value();
@@ -34,7 +34,7 @@ import { PageHeader } from '../components/page-header';
           <ion-row class="ion-justify-content-center ion-align-items-center">
             @for (quiz of quizzes; track quiz.id) {
               <ion-col>
-                <quiz-card [quiz]="quiz" />
+                <app-quiz-card [quiz]="quiz" />
               </ion-col>
             } @empty {
               <ion-col class="ion-text-center">
@@ -58,11 +58,11 @@ import { PageHeader } from '../components/page-header';
     IonGrid,
     IonRow,
     IonCol,
-    QuizCard,
+    QuizCardComponent,
     IonFab,
     IonFabButton,
     IonIcon,
-    PageHeader,
+    PageHeaderComponent,
   ],
 })
 export class QuizListPage {
@@ -79,7 +79,7 @@ export class QuizListPage {
 
   async openCreateQuizModal() {
     const modalRef = await this.modalCtrl.create({
-      component: CreateQuizModal,
+      component: CreateQuizModalComponent,
       cssClass: 'fullscreen-modal',
     });
 

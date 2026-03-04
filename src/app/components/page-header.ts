@@ -14,7 +14,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'page-header',
+  selector: 'app-page-header',
   template: `
     <ion-header [translucent]="translucent()" [collapse]="collapse()">
       <ion-toolbar>
@@ -32,7 +32,7 @@ import { Router } from '@angular/router';
   `,
   imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
 })
-export class PageHeader {
+export class PageHeaderComponent {
   readonly translucent = input<boolean>();
   readonly collapse = input<'condense' | 'fade' | undefined>(undefined);
 

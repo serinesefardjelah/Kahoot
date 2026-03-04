@@ -57,7 +57,7 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
 }
 
 @Component({
-  selector: 'create-quiz-modal',
+  selector: 'app-create-quiz-modal',
   template: `
     <form id="createQuizForm" (submit)="confirm($event)">
       <ion-header>
@@ -204,7 +204,7 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
     IonIcon,
   ],
 })
-export class CreateQuizModal {
+export class CreateQuizModalComponent {
   private readonly modalCtrl = inject(ModalController);
   private readonly quizService = inject(QuizService);
 
