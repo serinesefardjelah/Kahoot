@@ -1,15 +1,15 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
+import { Component, inject } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
+import { AuthService } from 'src/app/services/auth.service'
 import {
   IonButton,
   IonHeader,
   IonContent,
   IonToolbar,
   IonTitle,
-  IonInput,
-} from '@ionic/angular/standalone';
+  IonInput
+} from '@ionic/angular/standalone'
 
 @Component({
   selector: 'app-password-retrieve',
@@ -46,22 +46,22 @@ import {
     IonTitle,
     IonInput,
     CommonModule,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule
+  ]
 })
 export class PasswordRetrievePage {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder)
+  private readonly authService = inject(AuthService)
 
-  invalidEmailText = 'Not a valid email';
+  invalidEmailText = 'Not a valid email'
 
   passwordRetrieveForm = this.fb.group({
-    email: ['', Validators.email],
-  });
+    email: ['', Validators.email]
+  })
 
   onSubmit() {
     this.authService.sendResetPasswordLink(
       this.passwordRetrieveForm.value.email!
-    );
+    )
   }
 }

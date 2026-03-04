@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 import {
   IonHeader,
   IonToolbar,
   IonTitle,
-  IonContent,
-} from '@ionic/angular/standalone';
-import { PageHeaderComponent } from '../components/page-header';
+  IonContent
+} from '@ionic/angular/standalone'
+import { PageHeaderComponent } from '../components/page-header'
 
 @Component({
   selector: 'app-join-game',
@@ -19,6 +19,6 @@ import { PageHeaderComponent } from '../components/page-header';
     </ion-content>
   `,
   styles: [``],
-  imports: [IonContent, PageHeaderComponent],
+  imports: [IonContent, PageHeaderComponent]
 })
 export class JoinGamePage {}

@@ -5,10 +5,10 @@ import {
   inject,
   input,
   model,
-  output,
-} from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { form, Field, required, FieldTree } from '@angular/forms/signals';
+  output
+} from '@angular/core'
+import { rxResource } from '@angular/core/rxjs-interop'
+import { form, Field, required, FieldTree } from '@angular/forms/signals'
 import {
   IonHeader,
   IonToolbar,
@@ -30,22 +30,22 @@ import {
   ModalController,
   ActionSheetController,
   PopoverController,
-  IonPopover,
-} from '@ionic/angular/standalone';
-import { QuizService } from '../services/quiz.service';
+  IonPopover
+} from '@ionic/angular/standalone'
+import { QuizService } from '../services/quiz.service'
 
-import { addIcons } from 'ionicons';
+import { addIcons } from 'ionicons'
 import {
   trashOutline,
   saveOutline,
   add,
   ellipsisVerticalOutline,
-  createOutline,
-} from 'ionicons/icons';
-import { Router, RouterLink } from '@angular/router';
-import { Quiz } from '../models/quiz';
-import { CreateQuizModalComponent } from '../modals/create-quiz.modal';
-import { PageHeaderComponent } from '../components/page-header';
+  createOutline
+} from 'ionicons/icons'
+import { Router, RouterLink } from '@angular/router'
+import { Quiz } from '../models/quiz'
+import { CreateQuizModalComponent } from '../modals/create-quiz.modal'
+import { PageHeaderComponent } from '../components/page-header'
 
 @Component({
   selector: 'app-quiz-options-popover',
@@ -63,21 +63,21 @@ import { PageHeaderComponent } from '../components/page-header';
       </ion-list>
     </ion-content>
   `,
-  imports: [IonContent, IonList, IonItem, IonIcon, IonLabel],
+  imports: [IonContent, IonList, IonItem, IonIcon, IonLabel]
 })
 export class QuizOptionsPopoverComponent {
-  popoverCtrl = inject(PopoverController);
+  popoverCtrl = inject(PopoverController)
 
   constructor() {
-    addIcons({ createOutline, trashOutline });
+    addIcons({ createOutline, trashOutline })
   }
 
   delete() {
-    this.popoverCtrl.dismiss({ action: 'delete' });
+    this.popoverCtrl.dismiss({ action: 'delete' })
   }
 
   edit() {
-    this.popoverCtrl.dismiss({ action: 'edit' });
+    this.popoverCtrl.dismiss({ action: 'edit' })
   }
 }
 
@@ -122,35 +122,35 @@ export class QuizOptionsPopoverComponent {
     IonButtons,
     IonButton,
     IonIcon,
-    Field,
-  ],
+    Field
+  ]
 })
 export class QuizPageToolbarComponent {
-  popoverCtrl = inject(PopoverController);
-  quizForm = input.required<FieldTree<Quiz, string | number>>();
+  popoverCtrl = inject(PopoverController)
+  quizForm = input.required<FieldTree<Quiz, string | number>>()
 
-  delete = output<void>();
-  edit = output<void>();
+  delete = output<void>()
+  edit = output<void>()
 
   constructor() {
-    addIcons({ ellipsisVerticalOutline, trashOutline });
+    addIcons({ ellipsisVerticalOutline, trashOutline })
   }
 
   async openOptions(event: Event) {
     const popover = await this.popoverCtrl.create({
       component: QuizOptionsPopoverComponent,
       event,
-      translucent: true,
-    });
+      translucent: true
+    })
 
-    await popover.present();
+    await popover.present()
 
-    const { data } = await popover.onWillDismiss();
+    const { data } = await popover.onWillDismiss()
 
     if (data?.action === 'delete') {
-      this.delete.emit();
+      this.delete.emit()
     } else if (data?.action === 'edit') {
-      this.edit.emit();
+      this.edit.emit()
     }
   }
 }
@@ -206,16 +206,16 @@ export class QuizPageToolbarComponent {
     IonLabel,
     Field,
     QuizPageToolbarComponent,
-    PageHeaderComponent,
-  ],
+    PageHeaderComponent
+  ]
 })
 export class QuizPage {
-  private readonly quizService = inject(QuizService);
-  private readonly modalCtrl = inject(ModalController);
-  private readonly actionSheetCtrl = inject(ActionSheetController);
-  private readonly router = inject(Router);
+  private readonly quizService = inject(QuizService)
+  private readonly modalCtrl = inject(ModalController)
+  private readonly actionSheetCtrl = inject(ActionSheetController)
+  private readonly router = inject(Router)
 
-  readonly quizId = input.required<string>();
+  readonly quizId = input.required<string>()
 
   protected readonly quizResource = rxResource({
     stream: ({ params }) => this.quizService.getById(params.id),
@@ -224,40 +224,40 @@ export class QuizPage {
       id: '',
       title: '',
       description: '',
-      questions: [],
-    },
-  });
+      questions: []
+    }
+  })
 
   protected readonly quizForm = form(this.quizResource.value, (schemaPath) => {
-    required(schemaPath.title, { message: 'Title is required' });
-  });
+    required(schemaPath.title, { message: 'Title is required' })
+  })
 
-  quiz = computed(() => this.quizResource.value());
+  quiz = computed(() => this.quizResource.value())
 
   constructor() {
-    addIcons({ trashOutline, saveOutline, add });
+    addIcons({ trashOutline, saveOutline, add })
   }
 
   async openCreateQuestionModal() {}
 
   async updateQuiz(event: Event) {
-    event.preventDefault();
-    const quizFormValue = this.quizForm().value();
-    await this.quizService.setQuiz(quizFormValue);
-    this.quizForm().reset();
+    event.preventDefault()
+    const quizFormValue = this.quizForm().value()
+    await this.quizService.setQuiz(quizFormValue)
+    this.quizForm().reset()
   }
 
   async editQuiz() {
     const modalRef = await this.modalCtrl.create({
       component: CreateQuizModalComponent,
       componentProps: { quiz: this.quiz },
-      cssClass: 'fullscreen-modal',
-    });
+      cssClass: 'fullscreen-modal'
+    })
 
-    modalRef.present();
-    const eventDetails = await modalRef.onDidDismiss();
+    modalRef.present()
+    const eventDetails = await modalRef.onDidDismiss()
     if (eventDetails.data) {
-      this.quizService.setQuiz(eventDetails.data);
+      this.quizService.setQuiz(eventDetails.data)
     }
   }
 
@@ -267,22 +267,22 @@ export class QuizPage {
       buttons: [
         {
           text: 'Yes',
-          role: 'confirm',
+          role: 'confirm'
         },
         {
           text: 'No',
-          role: 'cancel',
-        },
-      ],
-    });
+          role: 'cancel'
+        }
+      ]
+    })
 
-    actionSheet.present();
+    actionSheet.present()
 
-    const { role } = await actionSheet.onWillDismiss();
+    const { role } = await actionSheet.onWillDismiss()
 
     if (role === 'confirm') {
-      await this.quizService.deleteQuiz(this.quizId());
-      this.router.navigateByUrl('/');
+      await this.quizService.deleteQuiz(this.quizId())
+      this.router.navigateByUrl('/')
     }
   }
 }

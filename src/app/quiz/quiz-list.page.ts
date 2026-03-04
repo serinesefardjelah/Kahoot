@@ -1,5 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, signal } from '@angular/core'
+import { rxResource, toSignal } from '@angular/core/rxjs-interop'
 import {
   IonHeader,
   IonToolbar,
@@ -11,14 +11,14 @@ import {
   IonFab,
   IonFabButton,
   IonIcon,
-  ModalController,
-} from '@ionic/angular/standalone';
-import { QuizService } from '../services/quiz.service';
-import { QuizCardComponent } from '../components/quiz.card';
-import { addIcons } from 'ionicons';
-import { add } from 'ionicons/icons';
-import { CreateQuizModalComponent } from '../modals/create-quiz.modal';
-import { PageHeaderComponent } from '../components/page-header';
+  ModalController
+} from '@ionic/angular/standalone'
+import { QuizService } from '../services/quiz.service'
+import { QuizCardComponent } from '../components/quiz.card'
+import { addIcons } from 'ionicons'
+import { add } from 'ionicons/icons'
+import { CreateQuizModalComponent } from '../modals/create-quiz.modal'
+import { PageHeaderComponent } from '../components/page-header'
 
 @Component({
   selector: 'app-quiz-list',
@@ -62,31 +62,31 @@ import { PageHeaderComponent } from '../components/page-header';
     IonFab,
     IonFabButton,
     IonIcon,
-    PageHeaderComponent,
-  ],
+    PageHeaderComponent
+  ]
 })
 export class QuizListPage {
-  private readonly quizService = inject(QuizService);
-  private readonly modalCtrl = inject(ModalController);
+  private readonly quizService = inject(QuizService)
+  private readonly modalCtrl = inject(ModalController)
 
   protected readonly quizzes = rxResource({
-    stream: () => this.quizService.getAll(),
-  });
+    stream: () => this.quizService.getAll()
+  })
 
   constructor() {
-    addIcons({ add });
+    addIcons({ add })
   }
 
   async openCreateQuizModal() {
     const modalRef = await this.modalCtrl.create({
       component: CreateQuizModalComponent,
-      cssClass: 'fullscreen-modal',
-    });
+      cssClass: 'fullscreen-modal'
+    })
 
-    modalRef.present();
-    const eventDetails = await modalRef.onDidDismiss();
+    modalRef.present()
+    const eventDetails = await modalRef.onDidDismiss()
     if (eventDetails.data) {
-      this.quizService.setQuiz(eventDetails.data);
+      this.quizService.setQuiz(eventDetails.data)
     }
   }
 }

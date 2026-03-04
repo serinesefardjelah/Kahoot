@@ -1,3 +1,3 @@
 export interface Choice {
-  text: string;
+  text: string
 }

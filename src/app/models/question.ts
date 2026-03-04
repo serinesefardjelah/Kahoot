@@ -1,8 +1,8 @@
-import { Choice } from './choice';
+import { Choice } from './choice'
 
 export interface Question {
-  id: string;
-  text: string;
-  choices: Choice[];
-  correctChoiceIndex: number;
+  id: string
+  text: string
+  choices: Choice[]
+  correctChoiceIndex: number
 }

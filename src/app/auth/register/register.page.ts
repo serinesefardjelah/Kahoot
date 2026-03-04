@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core'
+import { CommonModule } from '@angular/common'
 import {
   AbstractControl,
   FormBuilder,
@@ -7,17 +7,17 @@ import {
   ReactiveFormsModule,
   ValidationErrors,
   ValidatorFn,
-  Validators,
-} from '@angular/forms';
-import { AuthService } from 'src/app/services/auth.service';
+  Validators
+} from '@angular/forms'
+import { AuthService } from 'src/app/services/auth.service'
 import {
   IonButton,
   IonHeader,
   IonContent,
   IonToolbar,
   IonTitle,
-  IonInput,
-} from '@ionic/angular/standalone';
+  IonInput
+} from '@ionic/angular/standalone'
 
 @Component({
   selector: 'app-register',
@@ -82,42 +82,42 @@ import {
     IonTitle,
     IonInput,
     CommonModule,
-    ReactiveFormsModule,
-  ],
+    ReactiveFormsModule
+  ]
 })
 export class RegisterPage {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder)
+  private readonly authService = inject(AuthService)
 
-  invalidEmailText = 'Not a valid email';
-  invalidAliasText = 'Alias is required';
-  invalidPasswordText = 'Password should have at least 6 characters';
-  invalidPasswordConfirmText = 'Does not match password';
+  invalidEmailText = 'Not a valid email'
+  invalidAliasText = 'Alias is required'
+  invalidPasswordText = 'Password should have at least 6 characters'
+  invalidPasswordConfirmText = 'Does not match password'
 
   registerForm = this.fb.group({
     email: ['', [Validators.email, Validators.required]],
     alias: ['', [Validators.required]],
     password: ['', Validators.minLength(6)],
-    passwordConfirm: ['', passwordConfirmMatchPasswordValidator()],
-  });
+    passwordConfirm: ['', passwordConfirmMatchPasswordValidator()]
+  })
 
   onSubmit() {
-    const { email, password, alias } = this.registerForm.value;
-    this.authService.register(email!, password!, alias!);
+    const { email, password, alias } = this.registerForm.value
+    this.authService.register(email!, password!, alias!)
   }
 }
 
 export function passwordConfirmMatchPasswordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const controls = control.parent?.controls as {
-      [key: string]: AbstractControl | null;
-    };
+      [key: string]: AbstractControl | null
+    }
 
-    const password = controls ? controls['password']?.value : null;
-    const passwordConfirm = control?.value;
+    const password = controls ? controls['password']?.value : null
+    const passwordConfirm = control?.value
 
     return passwordConfirm === password
       ? null
-      : { passwordConfirmMissmatch: true };
-  };
+      : { passwordConfirmMissmatch: true }
+  }
 }

@@ -1,17 +1,17 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core'
 import {
   IonHeader,
   IonToolbar,
   IonTitle,
   IonButtons,
   IonButton,
-  IonIcon,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
-import { AuthService } from '../services/auth.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+  IonIcon
+} from '@ionic/angular/standalone'
+import { addIcons } from 'ionicons'
+import { logOutOutline } from 'ionicons/icons'
+import { AuthService } from '../services/auth.service'
+import { toSignal } from '@angular/core/rxjs-interop'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-page-header',
@@ -30,23 +30,23 @@ import { Router } from '@angular/router';
       </ion-toolbar>
     </ion-header>
   `,
-  imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon],
+  imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon]
 })
 export class PageHeaderComponent {
-  readonly translucent = input<boolean>();
-  readonly collapse = input<'condense' | 'fade' | undefined>(undefined);
+  readonly translucent = input<boolean>()
+  readonly collapse = input<'condense' | 'fade' | undefined>(undefined)
 
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly authService = inject(AuthService)
+  private readonly router = inject(Router)
 
-  readonly connectedUser = toSignal(this.authService.getConnectedUser());
+  readonly connectedUser = toSignal(this.authService.getConnectedUser())
 
   constructor() {
-    addIcons({ logOutOutline });
+    addIcons({ logOutOutline })
   }
 
   async logout() {
-    await this.authService.logout();
-    this.router.navigateByUrl('/login');
+    await this.authService.logout()
+    this.router.navigateByUrl('/login')
   }
 }

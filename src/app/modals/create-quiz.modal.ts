@@ -1,12 +1,12 @@
-import { Component, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, inject, input, linkedSignal, signal } from '@angular/core'
 import {
   applyEach,
   Field,
   form,
   required,
   SchemaPathTree,
-  validate,
-} from '@angular/forms/signals';
+  validate
+} from '@angular/forms/signals'
 import {
   IonHeader,
   IonToolbar,
@@ -29,31 +29,31 @@ import {
   IonRadio,
   IonRadioGroup,
   IonLabel,
-  IonIcon,
-} from '@ionic/angular/standalone';
-import { Quiz } from '../models/quiz';
-import { Choice } from '../models/choice';
-import { Question } from '../models/question';
-import { addIcons } from 'ionicons';
-import { removeOutline } from 'ionicons/icons';
-import { QuizService } from '../services/quiz.service';
+  IonIcon
+} from '@ionic/angular/standalone'
+import { Quiz } from '../models/quiz'
+import { Choice } from '../models/choice'
+import { Question } from '../models/question'
+import { addIcons } from 'ionicons'
+import { removeOutline } from 'ionicons/icons'
+import { QuizService } from '../services/quiz.service'
 
 function ChoiceSchema(choice: SchemaPathTree<Choice>) {
-  required(choice.text, { message: 'Choice text is required' });
+  required(choice.text, { message: 'Choice text is required' })
 }
 
 function QuestionSchema(question: SchemaPathTree<Question>) {
-  required(question.text, { message: 'Question text is required' });
+  required(question.text, { message: 'Question text is required' })
   validate(question.correctChoiceIndex, ({ value, valueOf }) => {
     if (!valueOf(question.choices)[value()]) {
       return {
         kind: 'no-correct-choice',
-        message: 'At least one choice must be marked as correct',
-      };
+        message: 'At least one choice must be marked as correct'
+      }
     }
-    return null;
-  });
-  applyEach(question.choices, ChoiceSchema);
+    return null
+  })
+  applyEach(question.choices, ChoiceSchema)
 }
 
 @Component({
@@ -201,47 +201,47 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
     IonRadio,
     IonRadioGroup,
     IonLabel,
-    IonIcon,
-  ],
+    IonIcon
+  ]
 })
 export class CreateQuizModalComponent {
-  private readonly modalCtrl = inject(ModalController);
-  private readonly quizService = inject(QuizService);
+  private readonly modalCtrl = inject(ModalController)
+  private readonly quizService = inject(QuizService)
 
   constructor() {
-    addIcons({ removeOutline });
+    addIcons({ removeOutline })
   }
 
-  quiz = input<Quiz>();
+  quiz = input<Quiz>()
 
-  _quiz = linkedSignal(() => this.quiz() ?? this.quizService.generateQuiz());
+  _quiz = linkedSignal(() => this.quiz() ?? this.quizService.generateQuiz())
 
   quizForm = form(this._quiz, (schemaPath) => {
-    required(schemaPath.title, { message: 'Title is required' });
-    applyEach(schemaPath.questions, QuestionSchema);
-  });
+    required(schemaPath.title, { message: 'Title is required' })
+    applyEach(schemaPath.questions, QuestionSchema)
+  })
 
   addQuestion() {
-    const newQuestionId = this.quizService.generateQuestionId(this._quiz().id);
+    const newQuestionId = this.quizService.generateQuestionId(this._quiz().id)
     const newQuestion: Question = {
       id: newQuestionId,
       text: '',
       choices: [{ text: '' }],
-      correctChoiceIndex: 0,
-    };
+      correctChoiceIndex: 0
+    }
     this._quiz.update((q) => ({
       ...q,
-      questions: [...q.questions, newQuestion],
-    }));
-    this.quizForm().markAsDirty();
+      questions: [...q.questions, newQuestion]
+    }))
+    this.quizForm().markAsDirty()
   }
 
   removeQuestion(questionId: string) {
     this._quiz.update((q) => ({
       ...q,
-      questions: q.questions.filter((question) => question.id !== questionId),
-    }));
-    this.quizForm().markAsDirty();
+      questions: q.questions.filter((question) => question.id !== questionId)
+    }))
+    this.quizForm().markAsDirty()
   }
 
   addChoice(questionId: string) {
@@ -251,13 +251,13 @@ export class CreateQuizModalComponent {
         if (question.id === questionId) {
           return {
             ...question,
-            choices: [...question.choices, { text: '' }],
-          };
+            choices: [...question.choices, { text: '' }]
+          }
         }
-        return question;
-      }),
-    }));
-    this.quizForm().markAsDirty();
+        return question
+      })
+    }))
+    this.quizForm().markAsDirty()
   }
 
   removeChoice(questionId: string, choiceIndex: number) {
@@ -266,34 +266,34 @@ export class CreateQuizModalComponent {
       questions: q.questions.map((question) => {
         if (question.id === questionId) {
           const updatedChoices = question.choices.filter(
-            (_, i) => i !== choiceIndex,
-          );
+            (_, i) => i !== choiceIndex
+          )
           return {
             ...question,
             choices: updatedChoices,
             correctChoiceIndex:
               question.correctChoiceIndex === choiceIndex
                 ? 0
-                : question.correctChoiceIndex,
-          };
+                : question.correctChoiceIndex
+          }
         }
-        return question;
-      }),
-    }));
-    this.quizForm().markAsDirty();
+        return question
+      })
+    }))
+    this.quizForm().markAsDirty()
   }
 
   cancel() {
-    this.modalCtrl.dismiss();
+    this.modalCtrl.dismiss()
   }
 
   confirm(event: Event) {
-    event.preventDefault();
+    event.preventDefault()
     if (this.quizForm().invalid()) {
-      return;
+      return
     }
-    const quizFormValue = this.quizForm().value();
+    const quizFormValue = this.quizForm().value()
 
-    this.modalCtrl.dismiss(quizFormValue);
+    this.modalCtrl.dismiss(quizFormValue)
   }
 }

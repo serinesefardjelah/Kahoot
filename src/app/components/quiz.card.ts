@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input } from '@angular/core'
 import {
   IonCard,
   IonCardHeader,
@@ -6,13 +6,13 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonButton,
-  IonIcon,
-} from '@ionic/angular/standalone';
-import { Quiz } from '../models/quiz';
-import { RouterLink } from '@angular/router';
-import { TitleCasePipe } from '@angular/common';
-import { playOutline } from 'ionicons/icons';
-import { addIcons } from 'ionicons';
+  IonIcon
+} from '@ionic/angular/standalone'
+import { Quiz } from '../models/quiz'
+import { RouterLink } from '@angular/router'
+import { TitleCasePipe } from '@angular/common'
+import { playOutline } from 'ionicons/icons'
+import { addIcons } from 'ionicons'
 
 @Component({
   selector: 'app-quiz-card',
@@ -46,18 +46,18 @@ import { addIcons } from 'ionicons';
     IonButton,
     IonIcon,
     RouterLink,
-    TitleCasePipe,
-  ],
+    TitleCasePipe
+  ]
 })
 export class QuizCardComponent {
-  readonly quiz = input.required<Quiz>();
+  readonly quiz = input.required<Quiz>()
 
   constructor() {
-    addIcons({ playOutline });
+    addIcons({ playOutline })
   }
 
   async createGame(event: MouseEvent) {
-    event.stopPropagation();
-    event.preventDefault();
+    event.stopPropagation()
+    event.preventDefault()
   }
 }

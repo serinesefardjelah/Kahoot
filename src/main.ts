@@ -1,23 +1,23 @@
-import { provideZoneChangeDetection } from '@angular/core';
-import { bootstrapApplication } from '@angular/platform-browser';
+import { provideZoneChangeDetection } from '@angular/core'
+import { bootstrapApplication } from '@angular/platform-browser'
 import {
   RouteReuseStrategy,
   provideRouter,
   withPreloading,
   PreloadAllModules,
-  withComponentInputBinding,
-} from '@angular/router';
+  withComponentInputBinding
+} from '@angular/router'
 import {
   IonicRouteStrategy,
-  provideIonicAngular,
-} from '@ionic/angular/standalone';
+  provideIonicAngular
+} from '@ionic/angular/standalone'
 
-import { routes } from './app/app.routes';
-import { AppComponent } from './app/app.component';
-import { getFirestore, provideFirestore } from '@angular/fire/firestore';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
-import { environment } from './environments/environment.prod';
-import { provideAuth, getAuth } from '@angular/fire/auth';
+import { routes } from './app/app.routes'
+import { AppComponent } from './app/app.component'
+import { getFirestore, provideFirestore } from '@angular/fire/firestore'
+import { provideFirebaseApp, initializeApp } from '@angular/fire/app'
+import { environment } from './environments/environment.prod'
+import { provideAuth, getAuth } from '@angular/fire/auth'
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -27,10 +27,10 @@ bootstrapApplication(AppComponent, {
     provideRouter(
       routes,
       withPreloading(PreloadAllModules),
-      withComponentInputBinding(),
+      withComponentInputBinding()
     ),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideFirestore(() => getFirestore()),
-    provideAuth(() => getAuth()),
-  ],
-});
+    provideAuth(() => getAuth())
+  ]
+})

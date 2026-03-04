@@ -1,12 +1,12 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 import {
   IonIcon,
   IonTabBar,
   IonTabButton,
-  IonTabs,
-} from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { gameControllerOutline, playCircle } from 'ionicons/icons';
+  IonTabs
+} from '@ionic/angular/standalone'
+import { addIcons } from 'ionicons'
+import { gameControllerOutline, playCircle } from 'ionicons/icons'
 
 @Component({
   selector: 'app-main',
@@ -22,10 +22,10 @@ import { gameControllerOutline, playCircle } from 'ionicons/icons';
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>`,
-  imports: [IonIcon, IonTabBar, IonTabButton, IonTabs],
+  imports: [IonIcon, IonTabBar, IonTabButton, IonTabs]
 })
 export class MainComponent {
   constructor() {
-    addIcons({ gameControllerOutline, playCircle });
+    addIcons({ gameControllerOutline, playCircle })
   }
 }

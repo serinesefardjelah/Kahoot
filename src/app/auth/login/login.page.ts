@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import {
   IonButton,
   IonHeader,
@@ -13,14 +13,14 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonIcon,
-} from '@ionic/angular/standalone';
-import { AuthService } from 'src/app/services/auth.service';
-import { RouterLink } from '@angular/router';
-import { addIcons } from 'ionicons';
-import { logoGoogle } from 'ionicons/icons';
+  IonIcon
+} from '@ionic/angular/standalone'
+import { AuthService } from 'src/app/services/auth.service'
+import { RouterLink } from '@angular/router'
+import { addIcons } from 'ionicons'
+import { logoGoogle } from 'ionicons/icons'
 
-addIcons({ logoGoogle });
+addIcons({ logoGoogle })
 
 @Component({
   selector: 'app-login',
@@ -120,24 +120,24 @@ addIcons({ logoGoogle });
     IonIcon,
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
-  ],
+    RouterLink
+  ]
 })
 export class LoginPage {
-  private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  private readonly fb = inject(FormBuilder)
+  private readonly authService = inject(AuthService)
 
   loginForm = this.fb.group({
     email: ['', [Validators.email, Validators.required]],
-    password: ['', Validators.minLength(6)],
-  });
+    password: ['', Validators.minLength(6)]
+  })
 
   onSubmit() {
-    const { email, password } = this.loginForm.value;
-    this.authService.login(email!, password!);
+    const { email, password } = this.loginForm.value
+    this.authService.login(email!, password!)
   }
 
   loginWithGoogle() {
-    this.authService.signInWithGoogle();
+    this.authService.signInWithGoogle()
   }
 }

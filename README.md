@@ -102,18 +102,25 @@ src/
 
 ## Scripts disponibles
 
-| Commande       | Description                        |
-|----------------|------------------------------------|
-| `npm start`    | Serveur de développement web       |
-| `npm run build`| Build de production (dossier `www/`)|
-| `npm test`     | Tests unitaires (Karma + Jasmine)  |
-| `npm run lint` | Analyse statique du code (ESLint)  |
+| Commande       | Description                                        |
+|----------------|----------------------------------------------------|
+| `npm start`    | Serveur de développement web                       |
+| `npm run build`| Build de production (dossier `www/`)               |
+| `npm test`     | Tests unitaires (Karma + Jasmine)                  |
+| `npm run lint` | Vérifie ESLint + formatage Prettier                |
+| `npm run fix`  | Corrige automatiquement ESLint + formate Prettier  |
 
 Avant chaque commit, vérifier que tout passe :
 
 ```bash
-npm run lint      # vérifie les règles ESLint
+npm run lint      # vérifie ESLint et le formatage Prettier
 npm run build     # vérifie que tout compile
+```
+
+En cas d'erreurs de formatage, les corriger automatiquement :
+
+```bash
+npm run fix
 ```
 
 ---
