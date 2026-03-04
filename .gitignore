@@ -68,3 +68,23 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+
+# Firebase config (ne jamais commiter les clés)
+src/environments/environment.ts
+src/environments/environment.prod.ts
+
+# Capacitor native builds
+/android/app/build/
+/android/.gradle/
+/android/local.properties
+/ios/App/Pods/
+/ios/App/App.xcworkspace/
+
+# Cypress artifacts
+/cypress/screenshots/
+/cypress/videos/
+/cypress/downloads/

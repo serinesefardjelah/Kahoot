@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "include": ["../node_modules/cypress", "**/*.cy.ts"],
   "compilerOptions": {
+    "composite": true,
     "noEmit": false,
     "sourceMap": false,
     "types": ["cypress", "@testing-library/cypress"]
