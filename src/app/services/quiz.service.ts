@@ -149,4 +149,14 @@ export class QuizService {
       ]
     }
   }
+
+  // Add this method to your existing QuizService class in quiz.service.ts
+
+  getQuestions(quizId: string): Observable<Question[]> {
+    if (!quizId) return new Observable((s) => s.next([]))
+    return collectionData(
+      collection(this.firestore, `quizzes/${quizId}/questions`),
+      { idField: 'id' }
+    ) as Observable<Question[]>
+  }
 }
