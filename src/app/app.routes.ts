@@ -36,6 +36,10 @@ export const routes: Routes = [
           import('./game/join-game.page').then((m) => m.JoinGamePage)
       },
       {
+        path: 'game/:gameId', // ← new: game lobby / in-game page
+        loadComponent: () => import('./game/game.page').then((m) => m.GamePage)
+      },
+      {
         path: '',
         redirectTo: 'quizzes',
         pathMatch: 'full'
