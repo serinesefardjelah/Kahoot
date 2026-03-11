@@ -137,7 +137,30 @@ export class AuthService {
     this.router.navigateByUrl('/')
   }
 
-  sendResetPasswordLink(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.auth, email)
+  async sendResetPasswordLink(email: string): Promise<void> {
+    let toast: HTMLIonToastElement | undefined
+    try {
+      await sendPasswordResetEmail(this.auth, email)
+      toast = await this.toastController.create({
+        message: 'Password reset email sent. Check your inbox.',
+        duration: 4000,
+        color: 'success'
+      })
+    } catch (error: any) {
+      console.error(error)
+      const message =
+        error?.code === 'auth/invalid-email'
+          ? 'Invalid email address.'
+          : error?.code === 'auth/user-not-found'
+            ? 'No account found with this email.'
+            : 'Something went wrong. Please try again.'
+      toast = await this.toastController.create({
+        message,
+        duration: 3000,
+        color: 'danger'
+      })
+    } finally {
+      await toast?.present()
+    }
   }
 }
