@@ -52,7 +52,8 @@ export class AuthService {
         if (!found) {
           toast = await this.toastController.create({
             message: 'No account found with this alias',
-            duration: 1500
+            duration: 3000,
+            color: 'danger'
           })
           await toast.present()
           return
@@ -62,17 +63,34 @@ export class AuthService {
       await signInWithEmailAndPassword(this.auth, email, password)
       this.router.navigateByUrl('/')
       toast = await this.toastController.create({
-        message: `Login successful`,
-        duration: 1500
+        message: 'Login successful',
+        duration: 1500,
+        color: 'success'
       })
-    } catch (error) {
+    } catch (error: any) {
       console.error(error)
       toast = await this.toastController.create({
-        message: `Something wrong happened during login`,
-        duration: 1500
+        message: this.getLoginErrorMessage(error?.code),
+        duration: 3000,
+        color: 'danger'
       })
     } finally {
       await toast?.present()
+    }
+  }
+
+  private getLoginErrorMessage(code: string): string {
+    switch (code) {
+      case 'auth/invalid-email':
+        return 'Invalid email address.'
+      case 'auth/invalid-credential':
+        return 'Incorrect email or password.'
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please try again later.'
+      case 'auth/user-disabled':
+        return 'This account has been disabled.'
+      default:
+        return 'Something went wrong. Please try again.'
     }
   }
 
