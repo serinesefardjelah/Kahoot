@@ -37,7 +37,9 @@ export class UserService {
     }) as Observable<UserWithAlias[]>
   }
 
-  async getByAlias(alias: string): Promise<{ uid: string; email: string } | null> {
+  async getByAlias(
+    alias: string
+  ): Promise<{ uid: string; email: string } | null> {
     const q = query(this.usersCollection, where('alias', '==', alias))
     const snapshot = await getDocs(q)
     if (snapshot.empty) return null
