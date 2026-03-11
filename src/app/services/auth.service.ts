@@ -33,14 +33,46 @@ export class AuthService {
     password: string,
     alias: string
   ): Promise<void> {
-    const userCred = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password
-    )
-    await this.userService.create({ alias, ...userCred.user })
-    await sendEmailVerification(userCred.user)
-    return this.logout()
+    let toast: HTMLIonToastElement | undefined
+    try {
+      const userCred = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password
+      )
+      await this.userService.create({ alias, ...userCred.user })
+      await sendEmailVerification(userCred.user)
+      await this.logout()
+      toast = await this.toastController.create({
+        message: 'Account created! Please verify your email before logging in.',
+        duration: 4000,
+        color: 'success'
+      })
+    } catch (error: any) {
+      console.error(error)
+      toast = await this.toastController.create({
+        message: this.getRegisterErrorMessage(error?.code),
+        duration: 3000,
+        color: 'danger'
+      })
+    } finally {
+      await toast?.present()
+    }
+  }
+
+  private getRegisterErrorMessage(code: string): string {
+    switch (code) {
+      case 'auth/email-already-in-use':
+        return 'This email is already associated with an account.'
+      case 'auth/invalid-email':
+        return 'Invalid email address.'
+      case 'auth/weak-password':
+        return 'Password is too weak. Use at least 6 characters.'
+      case 'auth/operation-not-allowed':
+        return 'Email/password registration is not enabled.'
+      default:
+        return 'Something went wrong. Please try again.'
+    }
   }
 
   async login(identifier: string, password: string): Promise<void> {
