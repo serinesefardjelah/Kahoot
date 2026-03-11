@@ -43,9 +43,22 @@ export class AuthService {
     return this.logout()
   }
 
-  async login(email: string, password: string): Promise<void> {
+  async login(identifier: string, password: string): Promise<void> {
     let toast: HTMLIonToastElement | undefined
     try {
+      let email = identifier
+      if (!identifier.includes('@')) {
+        const found = await this.userService.getByAlias(identifier)
+        if (!found) {
+          toast = await this.toastController.create({
+            message: 'No account found with this alias',
+            duration: 1500
+          })
+          await toast.present()
+          return
+        }
+        email = found.email
+      }
       await signInWithEmailAndPassword(this.auth, email, password)
       this.router.navigateByUrl('/')
       toast = await this.toastController.create({
