@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core'
+import { Component, inject, input } from '@angular/core'
 import {
   IonCard,
   IonCardHeader,
@@ -9,10 +9,13 @@ import {
   IonIcon
 } from '@ionic/angular/standalone'
 import { Quiz } from '../models/quiz'
-import { RouterLink } from '@angular/router'
+import { RouterLink, Router } from '@angular/router'
 import { TitleCasePipe } from '@angular/common'
 import { playOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons'
+import { GameService } from '../services/game.service'
+import { AuthService } from '../services/auth.service'
+import { firstValueFrom } from 'rxjs'
 
 @Component({
   selector: 'app-quiz-card',
@@ -36,7 +39,6 @@ import { addIcons } from 'ionicons'
       </ion-card-content>
     </ion-card>
   `,
-  styles: [``],
   imports: [
     IonCard,
     IonCardHeader,
@@ -52,6 +54,10 @@ import { addIcons } from 'ionicons'
 export class QuizCardComponent {
   readonly quiz = input.required<Quiz>()
 
+  private readonly gameService = inject(GameService)
+  private readonly authService = inject(AuthService)
+  private readonly router = inject(Router)
+
   constructor() {
     addIcons({ playOutline })
   }
@@ -59,5 +65,11 @@ export class QuizCardComponent {
   async createGame(event: MouseEvent) {
     event.stopPropagation()
     event.preventDefault()
+
+    const user = await firstValueFrom(this.authService.getConnectedUser())
+    if (!user) return
+
+    const gameId = await this.gameService.createGame(this.quiz(), user)
+    this.router.navigateByUrl(`/game/${gameId}`)
   }
 }

@@ -59,39 +59,40 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
 @Component({
   selector: 'app-create-quiz-modal',
   template: `
-    <form id="createQuizForm" (submit)="confirm($event)">
-      <ion-header>
-        <ion-toolbar>
-          <ion-buttons slot="start">
-            <ion-button
-              data-testid="cancel-create-quiz-button"
-              color="medium"
-              (click)="cancel()"
-            >
-              Cancel
-            </ion-button>
-          </ion-buttons>
-          <ion-title>
-            <ion-input
-              aria-label="Enter the quiz title"
-              [field]="quizForm.title"
-              placeholder="Guess the capital city"
-            ></ion-input>
-          </ion-title>
-          <ion-buttons slot="end">
-            <ion-button
-              data-testid="confirm-create-quiz-button"
-              type="submit"
-              form="createQuizForm"
-              [strong]="true"
-              [disabled]="quizForm().invalid()"
-            >
-              Confirm
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding" [fullscreen]="true">
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button
+            data-testid="cancel-create-quiz-button"
+            color="medium"
+            (click)="cancel()"
+          >
+            Cancel
+          </ion-button>
+        </ion-buttons>
+        <ion-title>
+          <ion-input
+            aria-label="Enter the quiz title"
+            [field]="quizForm.title"
+            placeholder="Guess the capital city"
+          ></ion-input>
+        </ion-title>
+        <ion-buttons slot="end">
+          <ion-button
+            data-testid="confirm-create-quiz-button"
+            type="submit"
+            form="createQuizForm"
+            [strong]="true"
+            [disabled]="quizForm().invalid()"
+          >
+            Confirm
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding" [fullscreen]="true">
+      <form id="createQuizForm" (submit)="confirm($event)">
         <ion-list>
           <ion-item>
             <ion-textarea
@@ -125,7 +126,12 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
                     </ion-card-title>
                   </ion-card-header>
                   <ion-card-content>
-                    <ion-radio-group [field]="question.correctChoiceIndex">
+                    <ion-radio-group
+                      [value]="question.correctChoiceIndex().value()"
+                      (ionChange)="
+                        onCorrectChoiceChange(question().value().id, $event)
+                      "
+                    >
                       <ion-list lines="none">
                         <ion-item>
                           <ion-label>Choices</ion-label>
@@ -165,8 +171,8 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
                     <ion-button
                       (click)="addChoice(question().value().id)"
                       expand="full"
-                      >Add choice
-                    </ion-button>
+                      >Add choice</ion-button
+                    >
                   </ion-card-content>
                 </ion-card>
               </ion-col>
@@ -176,8 +182,8 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
         <ion-button (click)="addQuestion()" expand="full">
           Add question
         </ion-button>
-      </ion-content>
-    </form>
+      </form>
+    </ion-content>
   `,
   imports: [
     IonHeader,
@@ -295,5 +301,20 @@ export class CreateQuizModalComponent {
     const quizFormValue = this.quizForm().value()
 
     this.modalCtrl.dismiss(quizFormValue)
+  }
+  onCorrectChoiceChange(questionId: string, event: CustomEvent) {
+    this._quiz.update((q) => ({
+      ...q,
+      questions: q.questions.map((question) => {
+        if (question.id === questionId) {
+          return {
+            ...question,
+            correctChoiceIndex: event.detail.value
+          }
+        }
+        return question
+      })
+    }))
+    this.quizForm().markAsDirty()
   }
 }
