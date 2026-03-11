@@ -1,0 +1,15 @@
+// Copie ce fichier en `environment.prod.ts` et remplis tes clés Firebase
+// Ne commite JAMAIS environment.prod.ts
+
+export const environment = {
+  production: true,
+  firebaseConfig: {
+    apiKey: 'VOTRE_API_KEY',
+    authDomain: 'VOTRE_PROJECT_ID.firebaseapp.com',
+    projectId: 'VOTRE_PROJECT_ID',
+    storageBucket: 'VOTRE_PROJECT_ID.firebasestorage.app',
+    messagingSenderId: 'VOTRE_MESSAGING_SENDER_ID',
+    appId: 'VOTRE_APP_ID',
+    measurementId: 'VOTRE_MEASUREMENT_ID',
+  },
+};
