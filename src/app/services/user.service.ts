@@ -4,7 +4,10 @@ import {
   collection,
   collectionData,
   doc,
-  Firestore
+  Firestore,
+  getDocs,
+  query,
+  where
 } from '@angular/fire/firestore'
 import { User } from '@angular/fire/auth'
 import { setDoc } from 'firebase/firestore'
@@ -23,7 +26,8 @@ export class UserService {
 
   create(user: UserWithAlias) {
     return setDoc(doc(this.firestore, `users/${user.uid}`), {
-      alias: user.alias
+      alias: user.alias,
+      email: user.email ?? ''
     })
   }
 
@@ -31,5 +35,13 @@ export class UserService {
     return collectionData(this.usersCollection, {
       idField: 'id'
     }) as Observable<UserWithAlias[]>
+  }
+
+  async getByAlias(alias: string): Promise<{ uid: string; email: string } | null> {
+    const q = query(this.usersCollection, where('alias', '==', alias))
+    const snapshot = await getDocs(q)
+    if (snapshot.empty) return null
+    const data = snapshot.docs[0].data() as { alias: string; email: string }
+    return { uid: snapshot.docs[0].id, email: data.email }
   }
 }

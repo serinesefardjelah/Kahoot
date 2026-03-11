@@ -44,12 +44,11 @@ addIcons({ logoGoogle })
               <ion-list>
                 <ion-item class="ion-margin-bottom">
                   <ion-input
-                    formControlName="email"
+                    formControlName="identifier"
                     fill="solid"
-                    label="Email"
+                    label="Email or Alias"
                     labelPlacement="floating"
-                    placeholder="user@gmail.com"
-                    type="email"
+                    placeholder="user@gmail.com or my_alias"
                   ></ion-input>
                 </ion-item>
                 <ion-item class="ion-margin-bottom">
@@ -128,13 +127,13 @@ export class LoginPage {
   private readonly authService = inject(AuthService)
 
   loginForm = this.fb.group({
-    email: ['', [Validators.email, Validators.required]],
+    identifier: ['', Validators.required],
     password: ['', Validators.minLength(6)]
   })
 
   onSubmit() {
-    const { email, password } = this.loginForm.value
-    this.authService.login(email!, password!)
+    const { identifier, password } = this.loginForm.value
+    this.authService.login(identifier!, password!)
   }
 
   loginWithGoogle() {
