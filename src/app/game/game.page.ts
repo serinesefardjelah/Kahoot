@@ -5,19 +5,20 @@ import {
   input,
   OnDestroy,
   OnInit,
-  signal
+  signal,
+  effect
 } from '@angular/core'
 import { rxResource, toSignal } from '@angular/core/rxjs-interop'
 import { IonContent, IonSpinner } from '@ionic/angular/standalone'
 import { GameService } from '../services/game.service'
 import { AuthService } from '../services/auth.service'
-import { QuizService } from '../services/quiz.service'
 import { Router } from '@angular/router'
 import { interval, Subscription } from 'rxjs'
 import { GameLobbyComponent } from './game-lobby.component'
 import { GameQuestionComponent } from './game-question.component'
 import { GameResultsComponent } from './game-results.component'
 import { GameScoreboardComponent } from './game-scoreboard.component'
+import { QuizService } from '../services/quiz.service'
 
 const QUESTION_TIME_SEC = 20
 
@@ -26,7 +27,6 @@ const QUESTION_TIME_SEC = 20
   template: `
     @let game = gameResource.value();
     @let players = playersResource.value() ?? [];
-    @let questions = questionsResource.value() ?? [];
 
     @if (!game) {
       <ion-content
@@ -55,13 +55,15 @@ const QUESTION_TIME_SEC = 20
       <app-game-question
         [question]="currentQuestion()!"
         [questionIndex]="game.currentQuestionIndex"
-        [total]="questions.length"
+        [total]="questionsResource.value()?.length ?? 0"
         [isHost]="isHost()"
         [hasAnswered]="hasAnswered()"
+        [selectedChoice]="selectedChoice()"
         [timeLeft]="timeLeft()"
         [timerProgress]="timerProgress()"
-        [answeredCount]="answersResource.value()?.length ?? 0"
+        [answers]="answersResource.value() ?? []"
         [playerCount]="players.length"
+        [players]="players"
         (answer)="submitAnswer($event)"
         (showResults)="showResults()"
       />
@@ -90,8 +92,10 @@ const QUESTION_TIME_SEC = 20
         [scores]="scores()"
         [isHost]="isHost()"
         [isFinal]="false"
+        [currentUserId]="connectedUser()?.uid ?? null"
         [nextLabel]="
-          game.currentQuestionIndex + 1 >= questions.length
+          game.currentQuestionIndex + 1 >=
+          (questionsResource.value()?.length ?? 0)
             ? 'End Game'
             : 'Next Question'
         "
@@ -104,6 +108,7 @@ const QUESTION_TIME_SEC = 20
         [scores]="scores()"
         [isHost]="isHost()"
         [isFinal]="true"
+        [currentUserId]="connectedUser()?.uid ?? null"
         (next)="goHome()"
       />
     }
@@ -120,8 +125,8 @@ const QUESTION_TIME_SEC = 20
 export class GamePage implements OnInit, OnDestroy {
   private readonly gameService = inject(GameService)
   private readonly authService = inject(AuthService)
-  private readonly quizService = inject(QuizService)
   private readonly router = inject(Router)
+  private readonly quizService = inject(QuizService)
 
   readonly gameId = input.required<string>()
   readonly connectedUser = toSignal(this.authService.getConnectedUser())
@@ -129,12 +134,6 @@ export class GamePage implements OnInit, OnDestroy {
   readonly gameResource = rxResource({
     stream: ({ params }) => this.gameService.getById(params.id),
     params: () => ({ id: this.gameId() })
-  })
-
-  // Load questions from the quiz subcollection, not from the game doc
-  readonly questionsResource = rxResource({
-    stream: ({ params }) => this.quizService.getQuestions(params.quizId),
-    params: () => ({ quizId: this.gameResource.value()?.quiz?.id ?? '' })
   })
 
   readonly playersResource = rxResource({
@@ -151,9 +150,33 @@ export class GamePage implements OnInit, OnDestroy {
     })
   })
 
+  readonly questionsResource = rxResource({
+    stream: ({ params }) => this.quizService.getQuestions(params.quizId),
+    params: () => ({ quizId: this.gameResource.value()?.quiz?.id ?? '' })
+  })
+
+  constructor() {
+    effect(() => {
+      const game = this.gameResource.value()
+      if (!game) return
+
+      const shouldLoad =
+        game.status === 'finished' ||
+        (game.status === 'in-progress' &&
+          game.currentQuestionStatus === 'scoreboard')
+
+      if (shouldLoad && this.scores().length === 0) {
+        this.gameService
+          .computeScores(this.gameId(), game.quiz.id)
+          .then((s) => this.scores.set(s))
+      }
+    })
+  }
+
   readonly timeLeft = signal(QUESTION_TIME_SEC)
   readonly timerProgress = computed(() => this.timeLeft() / QUESTION_TIME_SEC)
   readonly scores = signal<{ uid: string; alias: string; score: number }[]>([])
+  readonly selectedChoice = signal<number | null>(null)
 
   private timerSub?: Subscription
 
@@ -179,9 +202,9 @@ export class GamePage implements OnInit, OnDestroy {
   }
 
   currentQuestion() {
-    const questions = this.questionsResource.value()
     const game = this.gameResource.value()
-    if (!questions?.length || !game) return undefined
+    const questions = this.questionsResource.value()
+    if (!game || !questions?.length) return undefined
     return questions[game.currentQuestionIndex]
   }
 
@@ -197,12 +220,17 @@ export class GamePage implements OnInit, OnDestroy {
     await this.gameService.startGame(this.gameId())
   }
 
+  // async showResults() {
+  //   await this.gameService.showResults(this.gameId())
+  //   const game = this.gameResource.value()!
+  //   this.gameService
+  //     .computeScores(this.gameId(), game.quiz.id)
+  //     .then((s) => this.scores.set(s))
+  // }
+
   async showResults() {
     await this.gameService.showResults(this.gameId())
-    const quizId = this.gameResource.value()?.quiz?.id ?? ''
-    this.gameService
-      .computeScores(this.gameId(), quizId)
-      .then((s) => this.scores.set(s))
+    // scores are now computed reactively via the effect above
   }
 
   async showScoreboard() {
@@ -211,12 +239,13 @@ export class GamePage implements OnInit, OnDestroy {
 
   async nextQuestion() {
     const game = this.gameResource.value()!
-    const questions = this.questionsResource.value() ?? []
+    const totalQuestions = this.questionsResource.value()?.length ?? 0
     this.timeLeft.set(QUESTION_TIME_SEC)
+    this.selectedChoice.set(null)
     await this.gameService.nextQuestion(
       this.gameId(),
       game.currentQuestionIndex,
-      questions.length
+      totalQuestions // ← was game.quiz.questions.length
     )
   }
 
@@ -224,6 +253,7 @@ export class GamePage implements OnInit, OnDestroy {
     const user = this.connectedUser()
     const game = this.gameResource.value()
     if (!user || !game) return
+    this.selectedChoice.set(choiceIndex)
     await this.gameService.submitAnswer(
       this.gameId(),
       user.uid,

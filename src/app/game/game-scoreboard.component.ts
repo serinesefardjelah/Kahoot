@@ -10,7 +10,7 @@ import {
 } from '@ionic/angular/standalone'
 import { PageHeaderComponent } from '../components/page-header'
 import { addIcons } from 'ionicons'
-import { trophyOutline } from 'ionicons/icons'
+import { trophyOutline, sadOutline, ribbonOutline } from 'ionicons/icons'
 
 @Component({
   selector: 'app-game-scoreboard',
@@ -24,22 +24,58 @@ import { trophyOutline } from 'ionicons/icons'
       </app-page-header>
 
       @if (isFinal()) {
-        <div style="text-align:center;margin:2rem 0">
-          <ion-icon
-            name="trophy-outline"
-            style="font-size:5rem;color:var(--ion-color-warning)"
-          >
-          </ion-icon>
-          <h2>Game Over!</h2>
+        @let myScore = getMyScore();
+        @let isWinner =
+          myScore !== null &&
+          scores().length > 0 &&
+          myScore.score === scores()[0].score;
+
+        <div style="text-align:center;margin:1.5rem 0">
+          @if (isHost()) {
+            <ion-icon
+              name="trophy-outline"
+              style="font-size:4rem;color:var(--ion-color-warning)"
+            ></ion-icon>
+            <h2>Game Over!</h2>
+          } @else if (isWinner) {
+            <ion-icon
+              name="trophy-outline"
+              style="font-size:4rem;color:var(--ion-color-warning)"
+            ></ion-icon>
+            <h2 style="color:var(--ion-color-warning)">Congratulations!</h2>
+            <p style="color:var(--ion-color-medium)">
+              You won with {{ myScore!.score }} pts
+            </p>
+          } @else {
+            <ion-icon
+              name="ribbon-outline"
+              style="font-size:4rem;color:var(--ion-color-medium)"
+            ></ion-icon>
+            <h2>Game Over!</h2>
+            @if (myScore) {
+              <p style="color:var(--ion-color-medium)">
+                You finished #{{ myRank() }} with {{ myScore.score }} pts
+              </p>
+            }
+          }
         </div>
       }
 
       <ion-list>
         @for (entry of scores(); track entry.uid; let i = $index) {
-          <ion-item [color]="i === 0 ? 'warning' : ''">
-            <ion-label
-              ><strong>{{ i + 1 }}. {{ entry.alias }}</strong></ion-label
-            >
+          <ion-item
+            [color]="
+              i === 0 ? 'warning' : entry.uid === currentUserId() ? 'light' : ''
+            "
+          >
+            <ion-label>
+              <strong>{{ i + 1 }}. {{ entry.alias }}</strong>
+              @if (entry.uid === currentUserId()) {
+                <span style="color:var(--ion-color-primary);font-size:0.8rem">
+                  (you)</span
+                >
+              }
+            </ion-label>
             <ion-badge slot="end" [color]="i === 0 ? 'dark' : 'primary'">
               {{ entry.score }} pts
             </ion-badge>
@@ -47,7 +83,7 @@ import { trophyOutline } from 'ionicons/icons'
         }
       </ion-list>
 
-      @if (isHost()) {
+      @if (isHost() || isFinal()) {
         <ion-button
           expand="block"
           style="margin-top:2rem"
@@ -81,9 +117,20 @@ export class GameScoreboardComponent {
   readonly isHost = input.required<boolean>()
   readonly isFinal = input<boolean>(false)
   readonly nextLabel = input<string>('Next Question')
+  readonly currentUserId = input<string | null>(null)
   readonly next = output<void>()
 
   constructor() {
-    addIcons({ trophyOutline })
+    addIcons({ trophyOutline, sadOutline, ribbonOutline })
+  }
+
+  getMyScore(): { uid: string; alias: string; score: number } | null {
+    if (!this.currentUserId()) return null
+    return this.scores().find((s) => s.uid === this.currentUserId()) ?? null
+  }
+
+  myRank(): number {
+    if (!this.currentUserId()) return 0
+    return this.scores().findIndex((s) => s.uid === this.currentUserId()) + 1
   }
 }
