@@ -5,6 +5,7 @@ import {
   collectionData,
   doc,
   Firestore,
+  getDoc,
   getDocs,
   query,
   where
@@ -45,5 +46,14 @@ export class UserService {
     if (snapshot.empty) return null
     const data = snapshot.docs[0].data() as { alias: string; email: string }
     return { uid: snapshot.docs[0].id, email: data.email }
+  }
+
+  async getByUid(
+    uid: string
+  ): Promise<{ alias: string; email: string } | null> {
+    const userDoc = doc(this.firestore, `users/${uid}`)
+    const snapshot = await getDoc(userDoc)
+    if (!snapshot.exists()) return null
+    return snapshot.data() as { alias: string; email: string }
   }
 }
