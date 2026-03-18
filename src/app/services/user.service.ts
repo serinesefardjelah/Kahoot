@@ -48,7 +48,9 @@ export class UserService {
     return { uid: snapshot.docs[0].id, email: data.email }
   }
 
-  async getByUid(uid: string): Promise<{ alias: string; email: string } | null> {
+  async getByUid(
+    uid: string
+  ): Promise<{ alias: string; email: string } | null> {
     const userDoc = doc(this.firestore, `users/${uid}`)
     const snapshot = await getDoc(userDoc)
     if (!snapshot.exists()) return null
