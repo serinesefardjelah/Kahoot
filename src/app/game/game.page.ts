@@ -160,12 +160,11 @@ export class GamePage implements OnInit, OnDestroy {
       const game = this.gameResource.value()
       if (!game) return
 
-      const shouldLoad =
+      if (
         game.status === 'finished' ||
         (game.status === 'in-progress' &&
           game.currentQuestionStatus === 'scoreboard')
-
-      if (shouldLoad && this.scores().length === 0) {
+      ) {
         this.gameService
           .computeScores(this.gameId(), game.quiz.id)
           .then((s) => this.scores.set(s))
@@ -220,21 +219,18 @@ export class GamePage implements OnInit, OnDestroy {
     await this.gameService.startGame(this.gameId())
   }
 
-  // async showResults() {
-  //   await this.gameService.showResults(this.gameId())
-  //   const game = this.gameResource.value()!
-  //   this.gameService
-  //     .computeScores(this.gameId(), game.quiz.id)
-  //     .then((s) => this.scores.set(s))
-  // }
-
   async showResults() {
     await this.gameService.showResults(this.gameId())
-    // scores are now computed reactively via the effect above
+    const game = this.gameResource.value()!
+    const s = await this.gameService.computeScores(this.gameId(), game.quiz.id)
+    this.scores.set(s)
   }
 
   async showScoreboard() {
     await this.gameService.showScoreboard(this.gameId())
+    const game = this.gameResource.value()!
+    const s = await this.gameService.computeScores(this.gameId(), game.quiz.id)
+    this.scores.set(s) // ← ensures players also get scores when scoreboard appears
   }
 
   async nextQuestion() {

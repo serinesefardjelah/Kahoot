@@ -142,22 +142,39 @@ export class GameService {
 
     const players = playersSnap.docs.map((d) => d.data() as GamePlayer)
     const answers = answersSnap.docs.map((d) => d.data() as GameAnswer)
-    const questions = questionsSnap.docs.map((d) => d.data() as Question)
+
+    const questionMap = new Map<number, Question>()
+    questionsSnap.docs.forEach((d, i) => {
+      const q = d.data() as Question & { index?: number }
+      questionMap.set(q.index ?? i, q)
+    })
+
+    console.log('=== computeScores DEBUG ===')
+    console.log('players:', players)
+    console.log('answers:', answers)
+    console.log('questionMap:', Object.fromEntries(questionMap))
 
     return players
       .map((player) => {
-        const score = answers
-          .filter((a) => a.userId === player.uid)
-          .reduce((total, answer) => {
-            const question = questions[answer.questionIndex]
-            if (!question) return total
-            if (answer.choiceIndex !== question.correctChoiceIndex) return total
-            const speedBonus = Math.max(
-              0,
-              1000 - Math.floor(answer.timeMs / 20)
-            )
-            return total + 1000 + speedBonus
-          }, 0)
+        const playerAnswers = answers.filter((a) => a.userId === player.uid)
+        console.log(`player ${player.alias} answers:`, playerAnswers)
+
+        const score = playerAnswers.reduce((total, answer) => {
+          const question = questionMap.get(answer.questionIndex)
+          console.log(
+            `  questionIndex=${answer.questionIndex} → question:`,
+            question
+          )
+          console.log(
+            `  answer.choiceIndex=${answer.choiceIndex}, correct=${question?.correctChoiceIndex}`
+          )
+          if (!question) return total
+          if (answer.choiceIndex !== question.correctChoiceIndex) return total
+          const speedBonus = Math.max(0, 1000 - Math.floor(answer.timeMs / 20))
+          return total + 1000 + speedBonus
+        }, 0)
+
+        console.log(`  → final score for ${player.alias}:`, score)
         return { uid: player.uid, alias: player.alias, score }
       })
       .sort((a, b) => b.score - a.score)
