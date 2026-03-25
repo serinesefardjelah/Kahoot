@@ -2,13 +2,13 @@ import { inject, Injectable } from '@angular/core'
 import { Question } from '../models/question'
 import { Choice } from '../models/choice'
 import {
-  BehaviorSubject,
   combineLatest,
   map,
   mergeMap,
   Observable,
   switchMap,
-  tap
+  tap,
+  of
 } from 'rxjs'
 import { Quiz } from '../models/quiz'
 import {
@@ -31,26 +31,21 @@ export class QuizService {
   private firestore: Firestore = inject(Firestore) // inject Cloud Firestore
 
   getAll(): Observable<Quiz[]> {
-    // get a reference to the quizzes collection
     const quizzesCollection = collection(this.firestore, 'quizzes')
 
-    // get documents (data) from the collection using collectionData
-    const quizzesCollectionData = collectionData(quizzesCollection, {
-      idField: 'id'
-    }) as Observable<Quiz[]>
-
-    return quizzesCollectionData.pipe(
+    return (
+      collectionData(quizzesCollection, { idField: 'id' }) as Observable<Quiz[]>
+    ).pipe(
       mergeMap((quizzes) =>
-        combineLatest(
-          quizzes.map((quiz) =>
-            collectionCount(quizzesCollection).pipe(
-              map((count) => ({
-                ...quiz,
-                questionsCount: count
-              }))
+        quizzes.length === 0
+          ? of([])
+          : combineLatest(
+              quizzes.map((quiz) =>
+                collectionCount(
+                  collection(this.firestore, `quizzes/${quiz.id}/questions`) // ← per-quiz subcollection
+                ).pipe(map((count) => ({ ...quiz, questionsCount: count })))
+              )
             )
-          )
-        )
       )
     )
   }
@@ -97,18 +92,18 @@ export class QuizService {
       description: quiz.description
     })
 
-    for (const question of quiz.questions) {
+    quiz.questions.forEach((question, index) => {
       const questionRef = doc(
         this.firestore,
         `quizzes/${quiz.id}/questions/${question.id}`
       )
-
       batch.set(questionRef, {
         text: question.text,
         correctChoiceIndex: question.correctChoiceIndex,
-        choices: question.choices
+        choices: question.choices,
+        index // ← add this
       })
-    }
+    })
 
     await batch.commit()
   }
@@ -148,5 +143,15 @@ export class QuizService {
         }
       ]
     }
+  }
+
+  // Add this method to your existing QuizService class in quiz.service.ts
+
+  getQuestions(quizId: string): Observable<Question[]> {
+    if (!quizId) return new Observable((s) => s.next([]))
+    return collectionData(
+      collection(this.firestore, `quizzes/${quizId}/questions`),
+      { idField: 'id' }
+    ) as Observable<Question[]>
   }
 }
