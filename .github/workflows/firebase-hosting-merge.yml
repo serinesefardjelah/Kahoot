@@ -21,8 +21,7 @@ jobs:
       - run: npm install
 
       # Run build (using local ionic from node_modules)
-      - run: npx ionic build
-
+      - run: npm run build
       # Deploy
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
