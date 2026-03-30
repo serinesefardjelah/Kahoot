@@ -7,7 +7,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
-  sendEmailVerification
+  sendEmailVerification,
+  GoogleAuthProvider,
+  signInWithCredential
 } from '@angular/fire/auth'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
@@ -126,10 +128,43 @@ export class AuthService {
     }
   }
 
-  async signInWithGoogle() {
-    await FirebaseAuthentication.signInWithGoogle()
-
-    this.router.navigateByUrl('/')
+  async signInWithGoogle(): Promise<void> {
+    let toast: HTMLIonToastElement | undefined
+    try {
+      const result = await FirebaseAuthentication.signInWithGoogle()
+      const credential = GoogleAuthProvider.credential(
+        result.credential?.idToken
+      )
+      await signInWithCredential(this.auth, credential)
+      const uid = result.user?.uid
+      if (uid) {
+        const existing = await this.userService.getByUid(uid)
+        if (!existing) {
+          const alias =
+            result.user?.displayName?.replace(/\s+/g, '').toLowerCase() ??
+            `user_${uid.slice(0, 6)}`
+          await this.userService.createFromGoogle(
+            uid,
+            alias,
+            result.user?.email ?? ''
+          )
+        }
+      }
+      this.router.navigateByUrl('/')
+    } catch (error: any) {
+      console.error(error)
+      const message =
+        error?.code === 'auth/cancelled-popup-request' ||
+        error?.message?.includes('cancelled')
+          ? 'Google sign-in was cancelled.'
+          : 'Google sign-in failed. Please try again.'
+      toast = await this.toastController.create({
+        message,
+        duration: 3000,
+        color: 'danger'
+      })
+      await toast.present()
+    }
   }
 
   async logout(): Promise<void> {

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "73447201649",
+    "project_id": "kahoot-aaa4f",
+    "storage_bucket": "kahoot-aaa4f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:73447201649:android:5570ba6ec3bfa81dd8b4d0",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "73447201649-jbdtth2j0bt42ulof6bpc6873apjpnqs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.ionic.starter",
+            "certificate_hash": "ee954dfc054302700f2880136b1c5d18338e2068"
+          }
+        },
+        {
+          "client_id": "73447201649-0v8b84tub6ggj0odvknhcc4b7a0v7var.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlj0a0WFTq1GJtlOFXd97uR9ft2Jip8rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "73447201649-0v8b84tub6ggj0odvknhcc4b7a0v7var.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
