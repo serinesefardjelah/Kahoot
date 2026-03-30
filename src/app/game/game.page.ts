@@ -187,7 +187,13 @@ export class GamePage implements OnInit, OnDestroy {
         game.currentQuestionStatus === 'question'
       ) {
         const elapsed = Math.floor((Date.now() - game.questionStartedAt) / 1000)
-        this.timeLeft.set(Math.max(0, QUESTION_TIME_SEC - elapsed))
+        const remaining = Math.max(0, QUESTION_TIME_SEC - elapsed)
+        this.timeLeft.set(remaining)
+
+        // ← auto-advance when time runs out (host only)
+        if (remaining === 0 && this.isHost()) {
+          this.showResults()
+        }
       }
     })
   }

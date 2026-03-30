@@ -18,7 +18,7 @@ import { gameControllerOutline, playCircle } from 'ionicons/icons'
       </ion-tab-button>
       <ion-tab-button tab="join-game">
         <ion-icon name="game-controller-outline"></ion-icon>
-        Join Game
+        Join Game !
       </ion-tab-button>
     </ion-tab-bar>
   </ion-tabs>`,

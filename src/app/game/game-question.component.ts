@@ -112,7 +112,7 @@ import { GameAnswer } from '../models/game'
             <ion-button
               expand="block"
               [color]="choiceColors[idx % 4]"
-              [disabled]="hasAnswered()"
+              [disabled]="hasAnswered() || timeLeft() === 0"
               (click)="answer.emit(idx)"
               [style.opacity]="
                 hasAnswered() && selectedChoice() !== idx ? 0.3 : 1
@@ -130,6 +130,12 @@ import { GameAnswer } from '../models/game'
             style="text-align:center;margin-top:2rem;color:var(--ion-color-medium)"
           >
             Answer submitted! Waiting for results...
+          </p>
+        } @else if (timeLeft() === 0) {
+          <p
+            style="text-align:center;margin-top:2rem;color:var(--ion-color-danger)"
+          >
+            Time's up! Waiting for results...
           </p>
         }
       }

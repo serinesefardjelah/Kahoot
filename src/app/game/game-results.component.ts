@@ -33,11 +33,25 @@ import { GameAnswer } from '../models/game'
           @let total = answers().length;
           @let pct = total > 0 ? (count / total) * 100 : 0;
           @let isCorrect = idx === question().correctChoiceIndex;
+          @let isSelected = idx === selectedChoice();
+
           <div>
             <div
               style="display:flex;justify-content:space-between;margin-bottom:4px"
             >
-              <span style="font-weight:500">{{ choice.text }}</span>
+              <span style="font-weight:500">
+                {{ choice.text }}
+                @if (isSelected && !isCorrect) {
+                  <span style="color:var(--ion-color-danger);font-size:0.8rem">
+                    ← your answer</span
+                  >
+                }
+                @if (isSelected && isCorrect) {
+                  <span style="color:var(--ion-color-success);font-size:0.8rem">
+                    ← your answer ✓</span
+                  >
+                }
+              </span>
               <span>{{ count }} votes</span>
             </div>
             <div
@@ -48,7 +62,9 @@ import { GameAnswer } from '../models/game'
                 [style.background]="
                   isCorrect
                     ? 'var(--ion-color-success)'
-                    : 'var(--ion-color-medium)'
+                    : isSelected
+                      ? 'var(--ion-color-danger)'
+                      : 'var(--ion-color-medium)'
                 "
                 style="height:100%;border-radius:8px;transition:width 0.6s ease"
               ></div>
@@ -75,6 +91,7 @@ export class GameResultsComponent {
   readonly answers = input.required<GameAnswer[]>()
   readonly isHost = input.required<boolean>()
   readonly showScoreboard = output<void>()
+  readonly selectedChoice = input<number | null>(null)
 
   countForChoice(choiceIndex: number): number {
     return this.answers().filter((a) => a.choiceIndex === choiceIndex).length
