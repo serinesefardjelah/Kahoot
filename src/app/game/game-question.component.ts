@@ -44,6 +44,22 @@ import { GameAnswer } from '../models/game'
 
       <ion-card>
         <ion-card-content>
+          <ion-card>
+            <ion-card-content>
+              @if (question().imageUrl) {
+                <img
+                  [src]="question().imageUrl"
+                  alt="Question image"
+                  style="width:100%;max-height:220px;object-fit:cover;border-radius:10px;margin-bottom:1rem"
+                />
+              }
+              <p
+                style="font-size:1.3rem;font-weight:600;text-align:center;padding:1rem 0"
+              >
+                {{ question().text }}
+              </p>
+            </ion-card-content>
+          </ion-card>
           <p
             style="font-size:1.3rem;font-weight:600;text-align:center;padding:1rem 0"
           >

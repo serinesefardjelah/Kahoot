@@ -5,4 +5,5 @@ export interface Question {
   text: string
   choices: Choice[]
   correctChoiceIndex: number
+  imageUrl?: string | null
 }

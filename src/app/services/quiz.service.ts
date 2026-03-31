@@ -101,7 +101,8 @@ export class QuizService {
         text: question.text,
         correctChoiceIndex: question.correctChoiceIndex,
         choices: question.choices,
-        index // ← add this
+        index,
+        imageUrl: question.imageUrl ?? null
       })
     })
 
@@ -121,10 +122,11 @@ export class QuizService {
     return doc(collection(quizRef, 'questions')).id
   }
 
-  generateQuiz() {
+  generateQuiz(): Quiz {
     const quizId = this.generateQuizId()
     const questionId = this.generateQuestionId(quizId)
     const correctChoiceIndex = 0
+    const imageUrl = null
     return {
       id: quizId,
       title: 'Guess the Capital City',

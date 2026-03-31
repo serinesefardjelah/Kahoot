@@ -24,41 +24,51 @@ import { trophyOutline, sadOutline, ribbonOutline } from 'ionicons/icons'
       </app-page-header>
 
       @if (isFinal()) {
-        @let myScore = getMyScore();
-        @let isWinner =
-          myScore !== null &&
-          scores().length > 0 &&
-          myScore.score === scores()[0].score;
+        @if (!isHost()) {
+          // ← add this guard
+          @let myScore = getMyScore();
+          @let isWinner =
+            myScore !== null &&
+            scores().length > 0 &&
+            myScore.score === scores()[0].score;
 
-        <div style="text-align:center;margin:1.5rem 0">
-          @if (isHost()) {
-            <ion-icon
-              name="trophy-outline"
-              style="font-size:4rem;color:var(--ion-color-warning)"
-            ></ion-icon>
-            <h2>Game Over!</h2>
-          } @else if (isWinner) {
-            <ion-icon
-              name="trophy-outline"
-              style="font-size:4rem;color:var(--ion-color-warning)"
-            ></ion-icon>
-            <h2 style="color:var(--ion-color-warning)">Congratulations!</h2>
-            <p style="color:var(--ion-color-medium)">
-              You won with {{ myScore!.score }} pts
-            </p>
-          } @else {
-            <ion-icon
-              name="ribbon-outline"
-              style="font-size:4rem;color:var(--ion-color-medium)"
-            ></ion-icon>
-            <h2>Game Over!</h2>
-            @if (myScore) {
+          <div style="text-align:center;margin:1.5rem 0">
+            @if (isWinner) {
+              <ion-icon
+                name="trophy-outline"
+                style="font-size:4rem;color:var(--ion-color-warning)"
+              ></ion-icon>
+              <h2 style="color:var(--ion-color-warning)">Congratulations!</h2>
               <p style="color:var(--ion-color-medium)">
-                You finished #{{ myRank() }} with {{ myScore.score }} pts
+                You won with {{ myScore!.score }} pts
               </p>
+            } @else {
+              <ion-icon
+                name="ribbon-outline"
+                style="font-size:4rem;color:var(--ion-color-medium)"
+              ></ion-icon>
+              <h2>Game Over!</h2>
+              @if (myScore) {
+                <p style="color:var(--ion-color-medium)">
+                  You finished #{{ myRank() }} with {{ myScore.score }} pts
+                </p>
+              }
             }
-          }
-        </div>
+          </div>
+        } @else {
+          <!-- Host sees a neutral game summary header -->
+          <div style="text-align:center;margin:1.5rem 0">
+            <ion-icon
+              name="trophy-outline"
+              style="font-size:4rem;color:var(--ion-color-warning)"
+            ></ion-icon>
+            <h2>Final Results</h2>
+            <p style="color:var(--ion-color-medium)">
+              {{ scores().length }} players · Winner:
+              {{ scores()[0]?.alias ?? '—' }}
+            </p>
+          </div>
+        }
       }
 
       <ion-list>

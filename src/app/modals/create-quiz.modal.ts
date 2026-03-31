@@ -7,6 +7,8 @@ import {
   SchemaPathTree,
   validate
 } from '@angular/forms/signals'
+import { StorageService } from '../services/storage.service'
+import { IonSpinner } from '@ionic/angular/standalone'
 import {
   IonHeader,
   IonToolbar,
@@ -35,7 +37,7 @@ import { Quiz } from '../models/quiz'
 import { Choice } from '../models/choice'
 import { Question } from '../models/question'
 import { addIcons } from 'ionicons'
-import { removeOutline } from 'ionicons/icons'
+import { imageOutline, removeOutline } from 'ionicons/icons'
 import { QuizService } from '../services/quiz.service'
 
 function ChoiceSchema(choice: SchemaPathTree<Choice>) {
@@ -126,6 +128,58 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
                     </ion-card-title>
                   </ion-card-header>
                   <ion-card-content>
+                    <!-- Question image upload -->
+                    <div style="margin-bottom:1rem">
+                      @if (question().value().imageUrl) {
+                        <div style="position:relative;margin-bottom:0.5rem">
+                          <img
+                            [src]="question().value().imageUrl"
+                            alt="Question image"
+                            style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid var(--ion-color-light-shade)"
+                          />
+                          <ion-button
+                            fill="clear"
+                            color="danger"
+                            size="small"
+                            style="position:absolute;top:4px;right:4px;--background:rgba(0,0,0,0.5);border-radius:50%"
+                            (click)="removeQuestionImage(question().value().id)"
+                          >
+                            <ion-icon name="remove-outline"></ion-icon>
+                          </ion-button>
+                        </div>
+                      }
+
+                      @if (uploadingMap()[question().value().id]) {
+                        <div
+                          style="display:flex;align-items:center;gap:8px;color:var(--ion-color-medium);font-size:0.85rem;margin:8px 0"
+                        >
+                          <ion-spinner
+                            name="crescent"
+                            style="width:16px;height:16px"
+                          ></ion-spinner>
+                          Uploading image...
+                        </div>
+                      } @else {
+                        <label
+                          style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--ion-color-primary);font-size:0.9rem;padding:8px 0"
+                        >
+                          <ion-icon name="image-outline"></ion-icon>
+                          {{
+                            question().value().imageUrl
+                              ? 'Change image'
+                              : 'Add image (max 2MB)'
+                          }}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            style="display:none"
+                            (change)="
+                              onImageSelected(question().value().id, $event)
+                            "
+                          />
+                        </label>
+                      }
+                    </div>
                     <ion-radio-group
                       [value]="question.correctChoiceIndex().value()"
                       (ionChange)="
@@ -185,6 +239,7 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
       </form>
     </ion-content>
   `,
+
   imports: [
     IonHeader,
     IonToolbar,
@@ -207,7 +262,8 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
     IonRadio,
     IonRadioGroup,
     IonLabel,
-    IonIcon
+    IonIcon,
+    IonSpinner
   ]
 })
 export class CreateQuizModalComponent {
@@ -216,6 +272,7 @@ export class CreateQuizModalComponent {
 
   constructor() {
     addIcons({ removeOutline })
+    addIcons({ removeOutline, imageOutline })
   }
 
   quiz = input<Quiz>()
@@ -314,6 +371,47 @@ export class CreateQuizModalComponent {
         }
         return question
       })
+    }))
+    this.quizForm().markAsDirty()
+  }
+
+  private readonly storageService = inject(StorageService)
+
+  // track upload state per question id
+  readonly uploadingMap = signal<Record<string, boolean>>({})
+
+  async onImageSelected(questionId: string, event: Event) {
+    const input = event.target as HTMLInputElement
+    const file = input.files?.[0]
+    if (!file) return
+
+    this.uploadingMap.update((m) => ({ ...m, [questionId]: true }))
+    try {
+      const url = await this.storageService.uploadQuestionImage(
+        this._quiz().id,
+        questionId,
+        file
+      )
+      this._quiz.update((q) => ({
+        ...q,
+        questions: q.questions.map((question) =>
+          question.id === questionId ? { ...question, imageUrl: url } : question
+        )
+      }))
+      this.quizForm().markAsDirty()
+    } catch (err: any) {
+      alert(err.message) // replace with a toast if you prefer
+    } finally {
+      this.uploadingMap.update((m) => ({ ...m, [questionId]: false }))
+    }
+  }
+
+  removeQuestionImage(questionId: string) {
+    this._quiz.update((q) => ({
+      ...q,
+      questions: q.questions.map((question) =>
+        question.id === questionId ? { ...question, imageUrl: null } : question
+      )
     }))
     this.quizForm().markAsDirty()
   }

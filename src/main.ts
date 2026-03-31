@@ -11,6 +11,7 @@ import {
   IonicRouteStrategy,
   provideIonicAngular
 } from '@ionic/angular/standalone'
+import { getStorage, provideStorage } from '@angular/fire/storage'
 
 import { routes } from './app/app.routes'
 import { AppComponent } from './app/app.component'
@@ -31,6 +32,7 @@ bootstrapApplication(AppComponent, {
     ),
     provideFirebaseApp(() => initializeApp(environment.firebaseConfig)),
     provideFirestore(() => getFirestore()),
-    provideAuth(() => getAuth())
+    provideAuth(() => getAuth()),
+    provideStorage(() => getStorage())
   ]
 })
