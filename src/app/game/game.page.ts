@@ -13,12 +13,14 @@ import { IonContent, IonSpinner } from '@ionic/angular/standalone'
 import { GameService } from '../services/game.service'
 import { AuthService } from '../services/auth.service'
 import { Router } from '@angular/router'
-import { interval, Subscription } from 'rxjs'
+import { firstValueFrom, interval, Subscription } from 'rxjs'
 import { GameLobbyComponent } from './game-lobby.component'
 import { GameQuestionComponent } from './game-question.component'
 import { GameResultsComponent } from './game-results.component'
 import { GameScoreboardComponent } from './game-scoreboard.component'
 import { QuizService } from '../services/quiz.service'
+
+import { UserService } from '../services/user.service'
 
 const QUESTION_TIME_SEC = 20
 
@@ -41,6 +43,7 @@ const QUESTION_TIME_SEC = 20
       <app-game-lobby
         [entryCode]="game.entryCode"
         [players]="players"
+        [gameId]="gameId()"
         [isHost]="isHost()"
         (startGame)="startGame()"
       />
@@ -127,6 +130,7 @@ export class GamePage implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService)
   private readonly router = inject(Router)
   private readonly quizService = inject(QuizService)
+  private readonly userService = inject(UserService)
 
   readonly gameId = input.required<string>()
   readonly connectedUser = toSignal(this.authService.getConnectedUser())
@@ -156,19 +160,21 @@ export class GamePage implements OnInit, OnDestroy {
   })
 
   constructor() {
-    effect(() => {
+    // When game loads, register the player if they're not the host
+    effect(async () => {
       const game = this.gameResource.value()
-      if (!game) return
+      const user = this.connectedUser()
+      if (!game || !user) return
 
-      if (
-        game.status === 'finished' ||
-        (game.status === 'in-progress' &&
-          game.currentQuestionStatus === 'scoreboard')
-      ) {
-        this.gameService
-          .computeScores(this.gameId(), game.quiz.id)
-          .then((s) => this.scores.set(s))
-      }
+      // Don't register the host as a player
+      if (game.hostId === user.uid) return
+
+      // Get alias from user service
+      const users = await firstValueFrom(this.userService.getAll())
+      const userWithAlias = users.find((u) => u.uid === user.uid)
+      const alias = userWithAlias?.alias ?? user.email ?? 'Anonymous'
+
+      await this.gameService.joinGame(game.id, { uid: user.uid, alias })
     })
   }
 

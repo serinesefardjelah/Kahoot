@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { firstValueFrom } from 'rxjs'
 import {
   IonContent,
@@ -141,5 +142,15 @@ export class JoinGamePage {
     } finally {
       this.loading = false
     }
+  }
+  private readonly route = inject(ActivatedRoute)
+
+  constructor() {
+    // Auto-fill code if coming from QR scan
+    this.route.queryParams.subscribe((params) => {
+      if (params['code']) {
+        this.code = params['code'].toUpperCase()
+      }
+    })
   }
 }
