@@ -9,12 +9,16 @@ import {
   IonButton,
   IonSpinner,
   IonText,
-  ToastController
+  ToastController,
+  IonIcon
 } from '@ionic/angular/standalone'
 import { PageHeaderComponent } from '../components/page-header'
 import { GameService } from '../services/game.service'
 import { AuthService } from '../services/auth.service'
 import { UserService } from '../services/user.service'
+import { qrCodeOutline } from 'ionicons/icons'
+import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning'
+import { addIcons } from 'ionicons'
 
 @Component({
   selector: 'app-join-game',
@@ -33,6 +37,14 @@ import { UserService } from '../services/user.service'
           Enter the 4-character code shared by the host
         </p>
 
+        <ion-button
+          fill="outline"
+          style="width:100%;max-width:300px"
+          (click)="scanQrCode()"
+        >
+          <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+          Scan QR Code
+        </ion-button>
         <ion-input
           fill="outline"
           label="Entry Code"
@@ -73,7 +85,8 @@ import { UserService } from '../services/user.service'
     IonSpinner,
     IonText,
     PageHeaderComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    IonIcon
   ]
 })
 export class JoinGamePage {
@@ -147,10 +160,41 @@ export class JoinGamePage {
 
   constructor() {
     // Auto-fill code if coming from QR scan
+    addIcons({ qrCodeOutline })
+
     this.route.queryParams.subscribe((params) => {
       if (params['code']) {
         this.code = params['code'].toUpperCase()
       }
     })
+  }
+  async scanQrCode() {
+    try {
+      const { barcodes } = await BarcodeScanner.scan({
+        formats: [{ format: 'QR_CODE' } as any]
+      })
+
+      if (!barcodes.length) return
+
+      const raw = barcodes[0].rawValue // e.g. "https://kahoot-aaa4f.web.app/game/Ehi0PKPpJQGZlGd3xFYO"
+      if (!raw) return
+      // Extract the gameId from the URL
+      const match = raw.match(/\/game\/([a-zA-Z0-9]+)/)
+      if (match) {
+        // Navigate directly to game page — auto-join effect will handle registration
+        this.router.navigateByUrl(`/game/${match[1]}`)
+        return
+      }
+
+      // Fallback: try to extract a 4-char entry code
+      const codeMatch = raw.match(/[A-Z0-9]{4}/)
+      if (codeMatch) {
+        this.code = codeMatch[0]
+      }
+    } catch (err) {
+      console.error('Scan failed', err)
+      this.errorMessage =
+        'Scan failed. Please try again or enter the code manually.'
+    }
   }
 }
