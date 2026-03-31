@@ -41,6 +41,7 @@ const QUESTION_TIME_SEC = 20
       <app-game-lobby
         [entryCode]="game.entryCode"
         [players]="players"
+        [gameId]="gameId()"
         [isHost]="isHost()"
         (startGame)="startGame()"
       />
