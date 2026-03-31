@@ -29,6 +29,7 @@ const QUESTION_TIME_SEC = 20
   template: `
     @let game = gameResource.value();
     @let players = playersResource.value() ?? [];
+    @let q = currentQuestion();
 
     @if (!game) {
       <ion-content
@@ -53,10 +54,10 @@ const QUESTION_TIME_SEC = 20
       game &&
       game.status === 'in-progress' &&
       game.currentQuestionStatus === 'question' &&
-      currentQuestion()
+      q
     ) {
       <app-game-question
-        [question]="currentQuestion()!"
+        [question]="q!"
         [questionIndex]="game.currentQuestionIndex"
         [total]="questionsResource.value()?.length ?? 0"
         [isHost]="isHost()"
@@ -75,26 +76,16 @@ const QUESTION_TIME_SEC = 20
     @if (
       game &&
       game.status === 'in-progress' &&
-      game.currentQuestionStatus === 'results' &&
-      currentQuestion()
+      (game.currentQuestionStatus === 'results' ||
+        game.currentQuestionStatus === 'scoreboard') &&
+      q
     ) {
       <app-game-results
-        [question]="currentQuestion()!"
+        [question]="q!"
         [answers]="answersResource.value() ?? []"
         [isHost]="isHost()"
-        (showScoreboard)="showScoreboard()"
-      />
-    }
-
-    @if (
-      game &&
-      game.status === 'in-progress' &&
-      game.currentQuestionStatus === 'scoreboard'
-    ) {
-      <app-game-scoreboard
+        [selectedChoice]="selectedChoice()"
         [scores]="scores()"
-        [isHost]="isHost()"
-        [isFinal]="false"
         [currentUserId]="connectedUser()?.uid ?? null"
         [nextLabel]="
           game.currentQuestionIndex + 1 >=
@@ -102,7 +93,7 @@ const QUESTION_TIME_SEC = 20
             ? 'End Game'
             : 'Next Question'
         "
-        (next)="nextQuestion()"
+        (next)="nextFromResults()"
       />
     }
 
@@ -161,20 +152,18 @@ export class GamePage implements OnInit, OnDestroy {
 
   constructor() {
     // When game loads, register the player if they're not the host
-    effect(async () => {
+    effect(() => {
       const game = this.gameResource.value()
-      const user = this.connectedUser()
-      if (!game || !user) return
-
-      // Don't register the host as a player
-      if (game.hostId === user.uid) return
-
-      // Get alias from user service
-      const users = await firstValueFrom(this.userService.getAll())
-      const userWithAlias = users.find((u) => u.uid === user.uid)
-      const alias = userWithAlias?.alias ?? user.email ?? 'Anonymous'
-
-      await this.gameService.joinGame(game.id, { uid: user.uid, alias })
+      if (!game) return
+      if (
+        game.status === 'finished' ||
+        (game.status === 'in-progress' &&
+          game.currentQuestionStatus === 'results')
+      ) {
+        this.gameService
+          .computeScores(this.gameId(), game.quiz.id)
+          .then((s) => this.scores.set(s))
+      }
     })
   }
 
@@ -212,12 +201,12 @@ export class GamePage implements OnInit, OnDestroy {
     return this.gameResource.value()?.hostId === this.connectedUser()?.uid
   }
 
-  currentQuestion() {
+  readonly currentQuestion = computed(() => {
     const game = this.gameResource.value()
     const questions = this.questionsResource.value()
     if (!game || !questions?.length) return undefined
     return questions[game.currentQuestionIndex]
-  }
+  })
 
   hasAnswered(): boolean {
     const uid = this.connectedUser()?.uid
@@ -229,32 +218,6 @@ export class GamePage implements OnInit, OnDestroy {
 
   async startGame() {
     await this.gameService.startGame(this.gameId())
-  }
-
-  async showResults() {
-    await this.gameService.showResults(this.gameId())
-    const game = this.gameResource.value()!
-    const s = await this.gameService.computeScores(this.gameId(), game.quiz.id)
-    this.scores.set(s)
-  }
-
-  async showScoreboard() {
-    await this.gameService.showScoreboard(this.gameId())
-    const game = this.gameResource.value()!
-    const s = await this.gameService.computeScores(this.gameId(), game.quiz.id)
-    this.scores.set(s) // ← ensures players also get scores when scoreboard appears
-  }
-
-  async nextQuestion() {
-    const game = this.gameResource.value()!
-    const totalQuestions = this.questionsResource.value()?.length ?? 0
-    this.timeLeft.set(QUESTION_TIME_SEC)
-    this.selectedChoice.set(null)
-    await this.gameService.nextQuestion(
-      this.gameId(),
-      game.currentQuestionIndex,
-      totalQuestions // ← was game.quiz.questions.length
-    )
   }
 
   async submitAnswer(choiceIndex: number) {
@@ -271,6 +234,24 @@ export class GamePage implements OnInit, OnDestroy {
     )
   }
 
+  async showResults() {
+    await this.gameService.showResults(this.gameId())
+    const game = this.gameResource.value()!
+    const s = await this.gameService.computeScores(this.gameId(), game.quiz.id)
+    this.scores.set(s)
+  }
+
+  async nextFromResults() {
+    const game = this.gameResource.value()!
+    const totalQuestions = this.questionsResource.value()?.length ?? 0
+    this.timeLeft.set(QUESTION_TIME_SEC)
+    this.selectedChoice.set(null)
+    await this.gameService.nextQuestion(
+      this.gameId(),
+      game.currentQuestionIndex,
+      totalQuestions
+    )
+  }
   goHome() {
     this.router.navigateByUrl('/quizzes')
   }

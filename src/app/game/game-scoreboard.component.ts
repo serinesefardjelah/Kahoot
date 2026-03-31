@@ -25,7 +25,6 @@ import { trophyOutline, sadOutline, ribbonOutline } from 'ionicons/icons'
 
       @if (isFinal()) {
         @if (!isHost()) {
-          // ← add this guard
           @let myScore = getMyScore();
           @let isWinner =
             myScore !== null &&
