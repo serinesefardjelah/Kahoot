@@ -35,8 +35,8 @@ import { Router } from '@angular/router'
   styles: [
     `
       ion-toolbar {
-        --background: transparent;
-        --border-color: transparent;
+        --background: #160a30;
+        --border-color: rgba(192, 132, 252, 0.12);
       }
 
       .header-title {
