@@ -46,3 +46,68 @@ a {
   --max-width: 100%;
   --border-radius: 0;
 }
+
+/* Global button style */
+ion-button {
+  --border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+ion-button[expand="block"] {
+  height: 52px;
+}
+
+/* Global card style */
+ion-card {
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.12);
+}
+
+/* Global input style */
+ion-input, ion-textarea {
+  --border-radius: 12px;
+}
+
+/* Gradient FAB */
+ion-fab-button {
+  --background: linear-gradient(135deg, #7c3aed, #a855f7);
+  --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+}
+
+/* Tab bar selected state */
+ion-tab-button.tab-selected {
+  color: var(--ion-color-primary) !important;
+}
+
+/* Page background for in-game / main pages */
+.page-bg {
+  --background: linear-gradient(160deg, #0d0621 0%, #190d3a 60%, #2d1060 100%);
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(192, 132, 252, 0.2);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #e879f9, #7c3aed);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (prefers-color-scheme: dark) {
+  ion-toolbar {
+    --background: #160a30;
+  }
+
+  ion-tab-bar {
+    --background: #160a30;
+    border-top: 1px solid rgba(192, 132, 252, 0.12);
+  }
+}

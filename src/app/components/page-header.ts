@@ -18,11 +18,13 @@ import { Router } from '@angular/router'
   template: `
     <ion-header [translucent]="translucent()" [collapse]="collapse()">
       <ion-toolbar>
-        <ion-title> <ng-content /> </ion-title>
+        <ion-title class="header-title">
+          <ng-content />
+        </ion-title>
 
         @if (connectedUser()) {
           <ion-buttons slot="end">
-            <ion-button shape="round" (click)="logout()">
+            <ion-button shape="round" (click)="logout()" class="logout-btn">
               <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -30,6 +32,24 @@ import { Router } from '@angular/router'
       </ion-toolbar>
     </ion-header>
   `,
+  styles: [
+    `
+      ion-toolbar {
+        --background: transparent;
+        --border-color: transparent;
+      }
+
+      .header-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.2px;
+      }
+
+      .logout-btn {
+        --color: var(--ion-color-medium);
+      }
+    `
+  ],
   imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon]
 })
 export class PageHeaderComponent {
