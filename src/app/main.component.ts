@@ -25,26 +25,25 @@ import { gameControllerOutline, playCircle } from 'ionicons/icons'
       </ion-tab-bar>
     </ion-tabs>
   `,
-  styles: [
-    `
-      ion-tab-bar {
-        --background: #160a30;
-        border-top: 1px solid rgba(192, 132, 252, 0.12);
-        padding-bottom: env(safe-area-inset-bottom);
-        height: 60px;
-      }
+  styles: [`
+    ion-tab-bar {
+      --background: #ffffff;
+      border-top: 1px solid rgba(124, 58, 237, 0.08);
+      box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.06);
+      padding-bottom: env(safe-area-inset-bottom);
+      height: 62px;
+    }
 
-      ion-tab-button {
-        --color: rgba(192, 132, 252, 0.45);
-        --color-selected: #a855f7;
-      }
+    ion-tab-button {
+      --color: #c4b5fd;
+      --color-selected: #7c3aed;
+    }
 
-      ion-label {
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-    `
-  ],
+    ion-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+  `],
   imports: [IonIcon, IonTabBar, IonTabButton, IonTabs, IonLabel]
 })
 export class MainComponent {

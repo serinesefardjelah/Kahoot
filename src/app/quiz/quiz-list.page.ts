@@ -1,5 +1,5 @@
-import { Component, inject, signal } from '@angular/core'
-import { rxResource, toSignal } from '@angular/core/rxjs-interop'
+import { Component, inject } from '@angular/core'
+import { rxResource } from '@angular/core/rxjs-interop'
 import {
   IonContent,
   IonGrid,
@@ -13,7 +13,7 @@ import {
 import { QuizService } from '../services/quiz.service'
 import { QuizCardComponent } from '../components/quiz.card'
 import { addIcons } from 'ionicons'
-import { add, gridOutline } from 'ionicons/icons'
+import { add } from 'ionicons/icons'
 import { CreateQuizModalComponent } from '../modals/create-quiz.modal'
 import { PageHeaderComponent } from '../components/page-header'
 
@@ -29,11 +29,19 @@ import { PageHeaderComponent } from '../components/page-header'
 
       @if (!quizzes?.length) {
         <div class="empty-state">
-          <div class="empty-icon">📝</div>
-          <p class="empty-title">No quizzes yet</p>
-          <p class="empty-sub">Tap + to create your first quiz</p>
+          <div class="empty-art">
+            <div class="empty-circle c1"></div>
+            <div class="empty-circle c2"></div>
+            <div class="empty-circle c3"></div>
+            <span class="empty-emoji">📝</span>
+          </div>
+          <h3 class="empty-title">No quizzes yet</h3>
+          <p class="empty-sub">Tap the + button to create your first quiz</p>
         </div>
       } @else {
+        <div class="list-header">
+          <p class="list-count">{{ quizzes!.length }} quiz{{ quizzes!.length > 1 ? 'zes' : '' }}</p>
+        </div>
         <ion-grid class="quiz-grid">
           <ion-row>
             @for (quiz of quizzes; track quiz.id) {
@@ -52,64 +60,91 @@ import { PageHeaderComponent } from '../components/page-header'
       </ion-fab-button>
     </ion-fab>
   `,
-  styles: [
-    `
-      .list-content {
-        --padding-top: 0.5rem;
-      }
+  styles: [`
+    .list-content {
+      --background: #f8f5ff;
+    }
 
-      .quiz-grid {
-        padding: 0.75rem 0.75rem 5rem;
-      }
+    .list-header {
+      padding: 1rem 1.25rem 0.25rem;
+    }
 
-      ion-col {
-        padding: 0.4rem;
-      }
+    .list-count {
+      margin: 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
 
-      .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 60vh;
-        text-align: center;
-        padding: 2rem;
-      }
+    .quiz-grid {
+      padding: 0.5rem 0.75rem 5rem;
+    }
 
-      .empty-icon {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-      }
+    ion-col {
+      padding: 0.4rem;
+    }
 
-      .empty-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin: 0 0 0.5rem;
-        color: var(--ion-text-color);
-      }
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 65vh;
+      text-align: center;
+      padding: 2rem;
+    }
 
-      .empty-sub {
-        font-size: 0.9rem;
-        color: var(--ion-color-medium);
-        margin: 0;
-      }
+    .empty-art {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1.5rem;
+    }
 
-      ion-fab-button {
-        --background: linear-gradient(135deg, #7c3aed, #a855f7);
-        --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
-        margin-bottom: env(safe-area-inset-bottom);
-      }
-    `
-  ],
+    .empty-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.2;
+    }
+
+    .c1 { width: 120px; height: 120px; background: #7c3aed; top: 0; left: 0; }
+    .c2 { width: 80px; height: 80px; background: #a855f7; top: 20px; left: 20px; }
+    .c3 { width: 50px; height: 50px; background: #ec4899; top: 35px; left: 35px; }
+
+    .empty-emoji {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.5rem;
+    }
+
+    .empty-title {
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #1a0f2e;
+    }
+
+    .empty-sub {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      max-width: 220px;
+    }
+
+    ion-fab-button {
+      --background: linear-gradient(135deg, #7c3aed, #a855f7);
+      --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+      margin-bottom: env(safe-area-inset-bottom);
+    }
+  `],
   imports: [
-    IonContent,
-    IonGrid,
-    IonRow,
-    IonCol,
-    QuizCardComponent,
-    IonFab,
-    IonFabButton,
-    IonIcon,
+    IonContent, IonGrid, IonRow, IonCol,
+    QuizCardComponent, IonFab, IonFabButton, IonIcon,
     PageHeaderComponent
   ]
 })
@@ -122,7 +157,7 @@ export class QuizListPage {
   })
 
   constructor() {
-    addIcons({ add, gridOutline })
+    addIcons({ add })
   }
 
   async openCreateQuizModal() {
@@ -130,7 +165,6 @@ export class QuizListPage {
       component: CreateQuizModalComponent,
       cssClass: 'fullscreen-modal'
     })
-
     modalRef.present()
     const eventDetails = await modalRef.onDidDismiss()
     if (eventDetails.data) {

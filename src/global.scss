@@ -1,40 +1,20 @@
 /*
  * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+/* Light mode only — dark mode disabled */
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
 
 a {
   cursor: pointer;
@@ -47,67 +27,38 @@ a {
   --border-radius: 0;
 }
 
-/* Global button style */
+/* Global button */
 ion-button {
   --border-radius: 14px;
   font-weight: 600;
   letter-spacing: 0.2px;
+  text-transform: none;
 }
 
 ion-button[expand="block"] {
   height: 52px;
 }
 
-/* Global card style */
+/* Global card */
 ion-card {
-  border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.12);
-}
-
-/* Global input style */
-ion-input, ion-textarea {
-  --border-radius: 12px;
-}
-
-/* Gradient FAB */
-ion-fab-button {
-  --background: linear-gradient(135deg, #7c3aed, #a855f7);
-  --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
-}
-
-/* Tab bar selected state */
-ion-tab-button.tab-selected {
-  color: var(--ion-color-primary) !important;
-}
-
-/* Page background for in-game / main pages */
-.page-bg {
-  --background: linear-gradient(160deg, #0d0621 0%, #190d3a 60%, #2d1060 100%);
-}
-
-/* Glass card */
-.glass-card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(192, 132, 252, 0.2);
   border-radius: 20px;
-  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 16px rgba(124, 58, 237, 0.1);
 }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #e879f9, #7c3aed);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Global toolbar */
+ion-toolbar {
+  --background: #ffffff;
+  --border-color: rgba(124, 58, 237, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  ion-toolbar {
-    --background: #160a30;
-  }
+/* Tab bar */
+ion-tab-bar {
+  --background: #ffffff;
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
+  box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.06);
+}
 
-  ion-tab-bar {
-    --background: #160a30;
-    border-top: 1px solid rgba(192, 132, 252, 0.12);
-  }
+/* Gradient utility */
+.purple-gradient {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
 }

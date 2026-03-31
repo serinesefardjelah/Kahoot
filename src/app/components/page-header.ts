@@ -24,7 +24,7 @@ import { Router } from '@angular/router'
 
         @if (connectedUser()) {
           <ion-buttons slot="end">
-            <ion-button shape="round" (click)="logout()" class="logout-btn">
+            <ion-button (click)="logout()" class="logout-btn">
               <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
             </ion-button>
           </ion-buttons>
@@ -32,24 +32,23 @@ import { Router } from '@angular/router'
       </ion-toolbar>
     </ion-header>
   `,
-  styles: [
-    `
-      ion-toolbar {
-        --background: #160a30;
-        --border-color: rgba(192, 132, 252, 0.12);
-      }
+  styles: [`
+    ion-toolbar {
+      --background: #ffffff;
+      --border-color: rgba(124, 58, 237, 0.08);
+    }
 
-      .header-title {
-        font-weight: 700;
-        font-size: 1.1rem;
-        letter-spacing: 0.2px;
-      }
+    .header-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1a0f2e;
+      letter-spacing: -0.2px;
+    }
 
-      .logout-btn {
-        --color: var(--ion-color-medium);
-      }
-    `
-  ],
+    .logout-btn {
+      --color: #9ca3af;
+    }
+  `],
   imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon]
 })
 export class PageHeaderComponent {

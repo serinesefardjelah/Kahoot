@@ -12,25 +12,14 @@ import { IonSpinner } from '@ionic/angular/standalone'
 import {
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonButtons,
   IonButton,
   IonContent,
-  IonItem,
   IonInput,
-  IonList,
   IonTextarea,
   ModalController,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
   IonRadio,
   IonRadioGroup,
-  IonLabel,
   IonIcon
 } from '@ionic/angular/standalone'
 import { Quiz } from '../models/quiz'
@@ -48,10 +37,7 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
   required(question.text, { message: 'Question text is required' })
   validate(question.correctChoiceIndex, ({ value, valueOf }) => {
     if (!valueOf(question.choices)[value()]) {
-      return {
-        kind: 'no-correct-choice',
-        message: 'At least one choice must be marked as correct'
-      }
+      return { kind: 'no-correct-choice', message: 'At least one choice must be marked as correct' }
     }
     return null
   })
@@ -62,29 +48,15 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
   selector: 'app-create-quiz-modal',
   template: `
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar class="modal-toolbar">
         <ion-buttons slot="start">
-          <ion-button
-            data-testid="cancel-create-quiz-button"
-            color="medium"
-            (click)="cancel()"
-          >
-            Cancel
-          </ion-button>
+          <ion-button class="cancel-btn" (click)="cancel()">Cancel</ion-button>
         </ion-buttons>
-        <ion-title>
-          <ion-input
-            aria-label="Enter the quiz title"
-            [field]="quizForm.title"
-            placeholder="Guess the capital city"
-          ></ion-input>
-        </ion-title>
         <ion-buttons slot="end">
           <ion-button
-            data-testid="confirm-create-quiz-button"
+            class="confirm-btn"
             type="submit"
             form="createQuizForm"
-            [strong]="true"
             [disabled]="quizForm().invalid()"
           >
             Confirm
@@ -93,192 +65,415 @@ function QuestionSchema(question: SchemaPathTree<Question>) {
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding" [fullscreen]="true">
+    <ion-content class="modal-content">
       <form id="createQuizForm" (submit)="confirm($event)">
-        <ion-list>
-          <ion-item>
-            <ion-textarea
-              labelPlacement="stacked"
-              label="Enter the quiz description"
-              [field]="quizForm.description"
-              placeholder="Guess the capital city of various countries around the world."
-            ></ion-textarea>
-          </ion-item>
-        </ion-list>
-        <ion-grid>
-          <ion-row>
-            @for (question of quizForm.questions; track $index) {
-              <ion-col size="12">
-                <ion-card>
-                  <ion-button
-                    fill="clear"
-                    color="medium"
-                    class="ion-float-end"
-                    (click)="removeQuestion(question().value().id)"
-                  >
-                    <ion-icon name="remove-outline"></ion-icon>
-                  </ion-button>
-                  <ion-card-header>
-                    <ion-card-title>
-                      <ion-input
-                        aria-label="Enter the question text"
-                        [field]="question.text"
-                        placeholder="Question"
-                      ></ion-input>
-                    </ion-card-title>
-                  </ion-card-header>
-                  <ion-card-content>
-                    <!-- Question image upload -->
-                    <div style="margin-bottom:1rem">
-                      @if (question().value().imageUrl) {
-                        <div style="position:relative;margin-bottom:0.5rem">
-                          <img
-                            [src]="question().value().imageUrl"
-                            alt="Question image"
-                            style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;border:1px solid var(--ion-color-light-shade)"
-                          />
-                          <ion-button
-                            fill="clear"
-                            color="danger"
-                            size="small"
-                            style="position:absolute;top:4px;right:4px;--background:rgba(0,0,0,0.5);border-radius:50%"
-                            (click)="removeQuestionImage(question().value().id)"
-                          >
-                            <ion-icon name="remove-outline"></ion-icon>
-                          </ion-button>
-                        </div>
-                      }
 
-                      @if (uploadingMap()[question().value().id]) {
-                        <div
-                          style="display:flex;align-items:center;gap:8px;color:var(--ion-color-medium);font-size:0.85rem;margin:8px 0"
-                        >
-                          <ion-spinner
-                            name="crescent"
-                            style="width:16px;height:16px"
-                          ></ion-spinner>
-                          Uploading image...
-                        </div>
+        <!-- Quiz meta -->
+        <div class="quiz-meta">
+          <ion-input
+            class="title-input"
+            [field]="quizForm.title"
+            placeholder="Quiz title…"
+          ></ion-input>
+          <ion-textarea
+            class="desc-input"
+            [field]="quizForm.description"
+            placeholder="Description (optional)"
+            [autoGrow]="true"
+          ></ion-textarea>
+        </div>
+
+        <!-- Questions -->
+        <div class="questions-list">
+          @for (question of quizForm.questions; track $index; let qi = $index) {
+            <div class="question-card">
+
+              <!-- Question header row -->
+              <div class="q-top">
+                <div class="q-badge">Q{{ qi + 1 }}</div>
+                <ion-input
+                  class="q-text-input"
+                  [field]="question.text"
+                  placeholder="Type your question here…"
+                ></ion-input>
+                <button
+                  class="q-remove-btn"
+                  type="button"
+                  (click)="removeQuestion(question().value().id)"
+                >✕</button>
+              </div>
+
+              <!-- Image upload -->
+              <div class="q-image-area">
+                @if (question().value().imageUrl) {
+                  <div class="img-preview-wrap">
+                    <img [src]="question().value().imageUrl" class="img-preview" alt="Question image" />
+                    <button class="img-remove-btn" type="button" (click)="removeQuestionImage(question().value().id)">✕</button>
+                  </div>
+                }
+                @if (uploadingMap()[question().value().id]) {
+                  <div class="uploading-row">
+                    <ion-spinner name="crescent" style="width:14px;height:14px"></ion-spinner>
+                    Uploading…
+                  </div>
+                } @else {
+                  <label class="img-upload-label">
+                    <ion-icon name="image-outline"></ion-icon>
+                    {{ question().value().imageUrl ? 'Change image' : 'Add image' }}
+                    <input type="file" accept="image/*" style="display:none"
+                      (change)="onImageSelected(question().value().id, $event)" />
+                  </label>
+                }
+              </div>
+
+              <!-- Divider -->
+              <div class="q-divider"></div>
+
+              <!-- Choices -->
+              <ion-radio-group
+                [value]="question.correctChoiceIndex().value()"
+                (ionChange)="onCorrectChoiceChange(question().value().id, $event)"
+              >
+                <div class="choices-list">
+                  @for (choice of question.choices; track $index; let ci = $index; let first = $first) {
+                    <div class="choice-row" [class.is-correct]="question.correctChoiceIndex().value() === ci">
+                      <div class="choice-letter" [class]="'letter-' + (ci % 4)">
+                        {{ choiceLetters[ci] }}
+                      </div>
+                      <ion-input
+                        class="choice-input"
+                        [field]="choice.text"
+                        placeholder="Choice {{ ci + 1 }}"
+                      ></ion-input>
+                      <ion-radio [value]="ci" class="choice-radio"></ion-radio>
+                      @if (!first) {
+                        <button class="choice-del-btn" type="button"
+                          (click)="removeChoice(question().value().id, ci)">✕</button>
                       } @else {
-                        <label
-                          style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--ion-color-primary);font-size:0.9rem;padding:8px 0"
-                        >
-                          <ion-icon name="image-outline"></ion-icon>
-                          {{
-                            question().value().imageUrl
-                              ? 'Change image'
-                              : 'Add image (max 2MB)'
-                          }}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            style="display:none"
-                            (change)="
-                              onImageSelected(question().value().id, $event)
-                            "
-                          />
-                        </label>
+                        <span style="width:24px;flex-shrink:0"></span>
                       }
                     </div>
-                    <ion-radio-group
-                      [value]="question.correctChoiceIndex().value()"
-                      (ionChange)="
-                        onCorrectChoiceChange(question().value().id, $event)
-                      "
-                    >
-                      <ion-list lines="none">
-                        <ion-item>
-                          <ion-label>Choices</ion-label>
-                          <ion-label slot="end">Correct</ion-label>
-                        </ion-item>
-                        @for (
-                          choice of question.choices;
-                          track $index;
-                          let first = $first;
-                          let idx = $index
-                        ) {
-                          <ion-item>
-                            <ion-input
-                              aria-label="Enter the choice text"
-                              [field]="choice.text"
-                              placeholder="Choice"
-                            ></ion-input>
-                            <ion-radio slot="end" [value]="idx"></ion-radio>
-                            @if (!first) {
-                              <ion-button
-                                fill="clear"
-                                slot="end"
-                                color="medium"
-                                (click)="
-                                  removeChoice(question().value().id, idx)
-                                "
-                              >
-                                <ion-icon name="remove-outline"></ion-icon>
-                              </ion-button>
-                            } @else {
-                              <span slot="end" style="width: 2rem;"></span>
-                            }
-                          </ion-item>
-                        }
-                      </ion-list>
-                    </ion-radio-group>
-                    <ion-button
-                      (click)="addChoice(question().value().id)"
-                      expand="full"
-                      >Add choice</ion-button
-                    >
-                  </ion-card-content>
-                </ion-card>
-              </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
-        <ion-button (click)="addQuestion()" expand="full">
-          Add question
-        </ion-button>
+                  }
+                </div>
+              </ion-radio-group>
+
+              <button class="add-choice-btn" type="button" (click)="addChoice(question().value().id)">
+                + Add choice
+              </button>
+
+            </div>
+          }
+        </div>
+
+        <!-- Add question -->
+        <div class="add-q-wrap">
+          <ion-button expand="block" class="add-q-btn" type="button" (click)="addQuestion()">
+            + Add Question
+          </ion-button>
+        </div>
+
       </form>
     </ion-content>
   `,
+  styles: [`
+    /* Toolbar */
+    .modal-toolbar {
+      --background: #ffffff;
+      --border-color: rgba(124, 58, 237, 0.1);
+    }
 
+    .cancel-btn {
+      --color: #9ca3af;
+      font-weight: 500;
+    }
+
+    .confirm-btn {
+      --background: linear-gradient(135deg, #7c3aed, #a855f7);
+      --background-activated: #6d33d1;
+      --border-radius: 10px;
+      --color: #ffffff;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Content */
+    .modal-content {
+      --background: #f8f5ff;
+    }
+
+    /* Quiz meta */
+    .quiz-meta {
+      background: #ffffff;
+      margin: 1rem;
+      border-radius: 18px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 2px 12px rgba(124, 58, 237, 0.08);
+    }
+
+    .title-input {
+      --color: #1a0f2e;
+      --placeholder-color: #c4b5fd;
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .desc-input {
+      --color: #4b5563;
+      --placeholder-color: #d1d5db;
+      font-size: 0.9rem;
+    }
+
+    /* Questions list */
+    .questions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 0 1rem;
+    }
+
+    /* Question card */
+    .question-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 1.25rem;
+      box-shadow: 0 2px 16px rgba(124, 58, 237, 0.1);
+      border-left: 4px solid #7c3aed;
+    }
+
+    /* Question top row */
+    .q-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .q-badge {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .q-text-input {
+      flex: 1;
+      --color: #1a0f2e;
+      --placeholder-color: #c4b5fd;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .q-remove-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: none;
+      background: #fee2e2;
+      color: #ef4444;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    /* Image area */
+    .q-image-area {
+      margin-bottom: 1rem;
+    }
+
+    .img-preview-wrap {
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .img-preview {
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .img-remove-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.55);
+      color: white;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .uploading-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #9ca3af;
+      font-size: 0.82rem;
+      padding: 4px 0;
+    }
+
+    .img-upload-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #7c3aed;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    /* Divider */
+    .q-divider {
+      height: 1px;
+      background: #f3eeff;
+      margin-bottom: 0.75rem;
+    }
+
+    /* Choices */
+    .choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .choice-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 0.3rem 0.5rem 0.3rem 0.4rem;
+      border: 1.5px solid #f3f4f6;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .choice-row.is-correct {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    .choice-letter {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .letter-0 { background: #7c3aed; }
+    .letter-1 { background: #a855f7; }
+    .letter-2 { background: #ec4899; }
+    .letter-3 { background: #f59e0b; }
+
+    .choice-input {
+      flex: 1;
+      --color: #1a0f2e;
+      --placeholder-color: #d1d5db;
+      font-size: 0.9rem;
+      min-height: 36px;
+    }
+
+    .choice-radio {
+      --color: #d1d5db;
+      --color-checked: #10b981;
+      flex-shrink: 0;
+    }
+
+    .choice-del-btn {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: none;
+      background: #fee2e2;
+      color: #ef4444;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-choice-btn {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1.5px dashed #c4b5fd;
+      border-radius: 12px;
+      background: transparent;
+      color: #7c3aed;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-choice-btn:active {
+      background: #f3eeff;
+    }
+
+    /* Add question */
+    .add-q-wrap {
+      padding: 1rem 1rem 2.5rem;
+    }
+
+    .add-q-btn {
+      --background: linear-gradient(135deg, #7c3aed, #a855f7);
+      --background-activated: linear-gradient(135deg, #6d33d1, #944cd9);
+      --border-radius: 14px;
+      --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
+      height: 52px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+  `],
   imports: [
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonButtons,
-    IonButton,
-    IonContent,
-    IonItem,
-    IonInput,
-    Field,
-    IonList,
-    IonTextarea,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonRadio,
-    IonRadioGroup,
-    IonLabel,
-    IonIcon,
-    IonSpinner
+    IonHeader, IonToolbar, IonButtons, IonButton,
+    IonContent, IonInput, IonTextarea, Field,
+    IonRadio, IonRadioGroup, IonIcon, IonSpinner
   ]
 })
 export class CreateQuizModalComponent {
   private readonly modalCtrl = inject(ModalController)
   private readonly quizService = inject(QuizService)
+  private readonly storageService = inject(StorageService)
+
+  readonly choiceLetters = ['A', 'B', 'C', 'D', 'E', 'F']
+  readonly uploadingMap = signal<Record<string, boolean>>({})
 
   constructor() {
-    addIcons({ removeOutline })
     addIcons({ removeOutline, imageOutline })
   }
 
   quiz = input<Quiz>()
-
   _quiz = linkedSignal(() => this.quiz() ?? this.quizService.generateQuiz())
-
   quizForm = form(this._quiz, (schemaPath) => {
     required(schemaPath.title, { message: 'Title is required' })
     applyEach(schemaPath.questions, QuestionSchema)
@@ -287,38 +482,26 @@ export class CreateQuizModalComponent {
   addQuestion() {
     const newQuestionId = this.quizService.generateQuestionId(this._quiz().id)
     const newQuestion: Question = {
-      id: newQuestionId,
-      text: '',
-      choices: [{ text: '' }],
-      correctChoiceIndex: 0
+      id: newQuestionId, text: '',
+      choices: [{ text: '' }], correctChoiceIndex: 0
     }
-    this._quiz.update((q) => ({
-      ...q,
-      questions: [...q.questions, newQuestion]
-    }))
+    this._quiz.update((q) => ({ ...q, questions: [...q.questions, newQuestion] }))
     this.quizForm().markAsDirty()
   }
 
   removeQuestion(questionId: string) {
-    this._quiz.update((q) => ({
-      ...q,
-      questions: q.questions.filter((question) => question.id !== questionId)
-    }))
+    this._quiz.update((q) => ({ ...q, questions: q.questions.filter((q) => q.id !== questionId) }))
     this.quizForm().markAsDirty()
   }
 
   addChoice(questionId: string) {
     this._quiz.update((q) => ({
       ...q,
-      questions: q.questions.map((question) => {
-        if (question.id === questionId) {
-          return {
-            ...question,
-            choices: [...question.choices, { text: '' }]
-          }
-        }
-        return question
-      })
+      questions: q.questions.map((question) =>
+        question.id === questionId
+          ? { ...question, choices: [...question.choices, { text: '' }] }
+          : question
+      )
     }))
     this.quizForm().markAsDirty()
   }
@@ -327,71 +510,37 @@ export class CreateQuizModalComponent {
     this._quiz.update((q) => ({
       ...q,
       questions: q.questions.map((question) => {
-        if (question.id === questionId) {
-          const updatedChoices = question.choices.filter(
-            (_, i) => i !== choiceIndex
-          )
-          return {
-            ...question,
-            choices: updatedChoices,
-            correctChoiceIndex:
-              question.correctChoiceIndex === choiceIndex
-                ? 0
-                : question.correctChoiceIndex
-          }
+        if (question.id !== questionId) return question
+        return {
+          ...question,
+          choices: question.choices.filter((_, i) => i !== choiceIndex),
+          correctChoiceIndex:
+            question.correctChoiceIndex === choiceIndex ? 0 : question.correctChoiceIndex
         }
-        return question
       })
     }))
     this.quizForm().markAsDirty()
   }
 
-  cancel() {
-    this.modalCtrl.dismiss()
-  }
-
-  confirm(event: Event) {
-    event.preventDefault()
-    if (this.quizForm().invalid()) {
-      return
-    }
-    const quizFormValue = this.quizForm().value()
-
-    this.modalCtrl.dismiss(quizFormValue)
-  }
   onCorrectChoiceChange(questionId: string, event: CustomEvent) {
     this._quiz.update((q) => ({
       ...q,
-      questions: q.questions.map((question) => {
-        if (question.id === questionId) {
-          return {
-            ...question,
-            correctChoiceIndex: event.detail.value
-          }
-        }
-        return question
-      })
+      questions: q.questions.map((question) =>
+        question.id === questionId
+          ? { ...question, correctChoiceIndex: event.detail.value }
+          : question
+      )
     }))
     this.quizForm().markAsDirty()
   }
-
-  private readonly storageService = inject(StorageService)
-
-  // track upload state per question id
-  readonly uploadingMap = signal<Record<string, boolean>>({})
 
   async onImageSelected(questionId: string, event: Event) {
     const input = event.target as HTMLInputElement
     const file = input.files?.[0]
     if (!file) return
-
     this.uploadingMap.update((m) => ({ ...m, [questionId]: true }))
     try {
-      const url = await this.storageService.uploadQuestionImage(
-        this._quiz().id,
-        questionId,
-        file
-      )
+      const url = await this.storageService.uploadQuestionImage(this._quiz().id, questionId, file)
       this._quiz.update((q) => ({
         ...q,
         questions: q.questions.map((question) =>
@@ -400,7 +549,7 @@ export class CreateQuizModalComponent {
       }))
       this.quizForm().markAsDirty()
     } catch (err: any) {
-      alert(err.message) // replace with a toast if you prefer
+      alert(err.message)
     } finally {
       this.uploadingMap.update((m) => ({ ...m, [questionId]: false }))
     }
@@ -414,5 +563,13 @@ export class CreateQuizModalComponent {
       )
     }))
     this.quizForm().markAsDirty()
+  }
+
+  cancel() { this.modalCtrl.dismiss() }
+
+  confirm(event: Event) {
+    event.preventDefault()
+    if (this.quizForm().invalid()) return
+    this.modalCtrl.dismiss(this.quizForm().value())
   }
 }

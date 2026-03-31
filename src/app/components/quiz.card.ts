@@ -1,13 +1,8 @@
-import { Component, inject, input } from '@angular/core'
+import { Component, inject, input, computed } from '@angular/core'
 import {
   IonCard,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonCardContent,
   IonButton,
-  IonIcon,
-  IonBadge
+  IonIcon
 } from '@ionic/angular/standalone'
 import { Quiz } from '../models/quiz'
 import { RouterLink, Router } from '@angular/router'
@@ -18,119 +13,133 @@ import { GameService } from '../services/game.service'
 import { AuthService } from '../services/auth.service'
 import { firstValueFrom } from 'rxjs'
 
+const CARD_GRADIENTS = [
+  'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+  'linear-gradient(135deg, #6d28d9 0%, #ec4899 100%)',
+  'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+  'linear-gradient(135deg, #5b21b6 0%, #a855f7 100%)',
+  'linear-gradient(135deg, #7c3aed 0%, #db2777 100%)',
+]
+
 @Component({
   selector: 'app-quiz-card',
   template: `
     @let quiz = this.quiz();
-    <ion-card class="quiz-card" [routerLink]="'/quiz/' + quiz.id">
-      <div class="card-accent"></div>
-      <ion-card-header>
-        <div class="card-top">
-          <div class="card-info">
-            <ion-card-title class="card-title">
-              {{ quiz.title | titlecase }}
-            </ion-card-title>
-            <ion-card-subtitle class="card-subtitle">
-              <ion-icon
-                name="help-circle-outline"
-                style="vertical-align:middle;margin-right:4px"
-              ></ion-icon>
-              {{ quiz.questionsCount }} questions
-            </ion-card-subtitle>
-          </div>
-          <ion-button
-            class="play-btn"
-            (click)="createGame($event)"
-            shape="round"
-            fill="solid"
-          >
-            <ion-icon slot="icon-only" name="play-circle"></ion-icon>
-          </ion-button>
+    <div class="quiz-card" [style.background]="gradient()" [routerLink]="'/quiz/' + quiz.id">
+      <div class="card-body">
+        <div class="card-icon">📋</div>
+        <div class="card-content">
+          <h3 class="card-title">{{ quiz.title | titlecase }}</h3>
+          <p class="card-desc" *ngIf="quiz.description">{{ quiz.description }}</p>
+          <span class="card-count">
+            <ion-icon name="help-circle-outline"></ion-icon>
+            {{ quiz.questionsCount }} questions
+          </span>
         </div>
-      </ion-card-header>
-
-      @if (quiz.description) {
-        <ion-card-content class="card-desc">
-          {{ quiz.description }}
-        </ion-card-content>
-      }
-    </ion-card>
+      </div>
+      <button class="play-btn" (click)="createGame($event)">
+        <ion-icon name="play-circle"></ion-icon>
+      </button>
+    </div>
   `,
-  styles: [
-    `
-      .quiz-card {
-        border-radius: 18px;
-        overflow: hidden;
-        margin: 0;
-        position: relative;
-        border: 1px solid rgba(192, 132, 252, 0.15);
-        box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
-        cursor: pointer;
-      }
+  styles: [`
+    .quiz-card {
+      border-radius: 20px;
+      padding: 1.25rem;
+      cursor: pointer;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 6px 24px rgba(124, 58, 237, 0.25);
+      margin-bottom: 0;
+      min-height: 100px;
+    }
 
-      .card-accent {
-        height: 4px;
-        background: linear-gradient(90deg, #7c3aed, #ec4899);
-      }
+    .card-body {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex: 1;
+      min-width: 0;
+    }
 
-      .card-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-      }
+    .card-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.2);
+      border-radius: 14px;
+    }
 
-      .card-info {
-        flex: 1;
-        min-width: 0;
-      }
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
 
-      .card-title {
-        font-size: 1rem;
-        font-weight: 700;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+    .card-title {
+      margin: 0 0 0.2rem;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .card-subtitle {
-        font-size: 0.8rem;
-        margin-top: 0.2rem;
-        color: var(--ion-color-medium);
-      }
+    .card-desc {
+      margin: 0 0 0.35rem;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.75);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      .play-btn {
-        --background: linear-gradient(135deg, #7c3aed, #a855f7);
-        --border-radius: 50%;
-        --box-shadow: 0 4px 14px rgba(124, 58, 237, 0.45);
-        width: 44px;
-        height: 44px;
-        flex-shrink: 0;
-        font-size: 1.4rem;
-      }
+    .card-count {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      background: rgba(255,255,255,0.18);
+      padding: 2px 8px;
+      border-radius: 100px;
+    }
 
-      .card-desc {
-        font-size: 0.875rem;
-        color: var(--ion-color-medium);
-        padding-top: 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-    `
-  ],
+    .card-count ion-icon {
+      font-size: 0.8rem;
+    }
+
+    .play-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.25);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 1.5rem;
+      color: white;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .play-btn:active {
+      background: rgba(255,255,255,0.4);
+      transform: scale(0.92);
+    }
+  `],
   imports: [
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonCardContent,
-    IonButton,
-    IonIcon,
-    IonBadge,
-    RouterLink,
-    TitleCasePipe
+    IonCard, IonButton, IonIcon,
+    RouterLink, TitleCasePipe
   ]
 })
 export class QuizCardComponent {
@@ -140,6 +149,12 @@ export class QuizCardComponent {
   private readonly authService = inject(AuthService)
   private readonly router = inject(Router)
 
+  readonly gradient = computed(() => {
+    const title = this.quiz().title ?? ''
+    const index = title.charCodeAt(0) % CARD_GRADIENTS.length
+    return CARD_GRADIENTS[index]
+  })
+
   constructor() {
     addIcons({ playCircle, helpCircleOutline })
   }
@@ -147,10 +162,8 @@ export class QuizCardComponent {
   async createGame(event: MouseEvent) {
     event.stopPropagation()
     event.preventDefault()
-
     const user = await firstValueFrom(this.authService.getConnectedUser())
     if (!user) return
-
     const gameId = await this.gameService.createGame(this.quiz(), user)
     this.router.navigateByUrl(`/game/${gameId}`)
   }
