@@ -29,34 +29,35 @@ import { UserService } from '../services/user.service'
           <p class="hero-sub">Ask the host for their 4-character code</p>
         </div>
 
-        <!-- 4 boxes — tap to open keyboard -->
-        <div class="code-boxes" (click)="focusInput()">
-          @for (i of [0, 1, 2, 3]; track i) {
-            <div
-              class="code-box"
-              [class.filled]="code.length > i"
-              [class.active]="code.length === i"
-            >
-              {{ code[i] ?? '' }}
-            </div>
-          }
-        </div>
+        <!-- 4 boxes — hidden input overlaid on top so mobile backspace works -->
+        <div class="code-area-wrap">
+          <div class="code-boxes">
+            @for (i of [0, 1, 2, 3]; track i) {
+              <div
+                class="code-box"
+                [class.filled]="code.length > i"
+                [class.active]="code.length === i"
+              >
+                {{ code[i] ?? '' }}
+              </div>
+            }
+          </div>
 
-        <!-- Hidden real input that captures keyboard -->
-        <input
-          #codeInput
-          class="hidden-input"
-          [value]="code"
-          (input)="onInput($event)"
-          (keydown)="onKeydown($event)"
-          maxlength="4"
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="characters"
-          spellcheck="false"
-          inputmode="text"
-          type="text"
-        />
+          <input
+            #codeInput
+            class="hidden-input"
+            [value]="code"
+            (input)="onInput($event)"
+            (keydown)="onKeydown($event)"
+            maxlength="4"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="characters"
+            spellcheck="false"
+            inputmode="text"
+            type="text"
+          />
+        </div>
 
         <p class="tap-hint">Tap the boxes to type</p>
 
@@ -130,10 +131,14 @@ import { UserService } from '../services/user.service'
       }
 
       /* 4 code boxes */
+      .code-area-wrap {
+        position: relative;
+      }
+
       .code-boxes {
         display: flex;
         gap: 0.75rem;
-        cursor: text;
+        pointer-events: none;
       }
 
       .code-box {
@@ -166,15 +171,16 @@ import { UserService } from '../services/user.service'
         transform: scale(1.05);
       }
 
-      /* Hidden real input */
+      /* Hidden real input — covers the code boxes, no pointer-events:none so mobile backspace works */
       .hidden-input {
         position: absolute;
+        inset: 0;
         opacity: 0;
-        width: 1px;
-        height: 1px;
-        pointer-events: none;
         border: none;
         outline: none;
+        cursor: text;
+        z-index: 1;
+        font-size: 16px; /* prevents iOS auto-zoom on focus */
       }
 
       .tap-hint {
