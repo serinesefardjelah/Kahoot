@@ -40,7 +40,9 @@ import { PageHeaderComponent } from '../components/page-header'
         </div>
       } @else {
         <div class="list-header">
-          <p class="list-count">{{ quizzes!.length }} quiz{{ quizzes!.length > 1 ? 'zes' : '' }}</p>
+          <p class="list-count">
+            {{ quizzes!.length }} quiz{{ quizzes!.length > 1 ? 'zes' : '' }}
+          </p>
         </div>
         <ion-grid class="quiz-grid">
           <ion-row>
@@ -60,91 +62,117 @@ import { PageHeaderComponent } from '../components/page-header'
       </ion-fab-button>
     </ion-fab>
   `,
-  styles: [`
-    .list-content {
-      --background: #f8f5ff;
-    }
+  styles: [
+    `
+      .list-content {
+        --background: #f8f5ff;
+      }
 
-    .list-header {
-      padding: 1rem 1.25rem 0.25rem;
-    }
+      .list-header {
+        padding: 1rem 1.25rem 0.25rem;
+      }
 
-    .list-count {
-      margin: 0;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
+      .list-count {
+        margin: 0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
 
-    .quiz-grid {
-      padding: 0.5rem 0.75rem 5rem;
-    }
+      .quiz-grid {
+        padding: 0.5rem 0.75rem 5rem;
+      }
 
-    ion-col {
-      padding: 0.4rem;
-    }
+      ion-col {
+        padding: 0.4rem;
+      }
 
-    /* Empty state */
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 65vh;
-      text-align: center;
-      padding: 2rem;
-    }
+      /* Empty state */
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 65vh;
+        text-align: center;
+        padding: 2rem;
+      }
 
-    .empty-art {
-      position: relative;
-      width: 120px;
-      height: 120px;
-      margin-bottom: 1.5rem;
-    }
+      .empty-art {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        margin-bottom: 1.5rem;
+      }
 
-    .empty-circle {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.2;
-    }
+      .empty-circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.2;
+      }
 
-    .c1 { width: 120px; height: 120px; background: #7c3aed; top: 0; left: 0; }
-    .c2 { width: 80px; height: 80px; background: #a855f7; top: 20px; left: 20px; }
-    .c3 { width: 50px; height: 50px; background: #ec4899; top: 35px; left: 35px; }
+      .c1 {
+        width: 120px;
+        height: 120px;
+        background: #7c3aed;
+        top: 0;
+        left: 0;
+      }
+      .c2 {
+        width: 80px;
+        height: 80px;
+        background: #a855f7;
+        top: 20px;
+        left: 20px;
+      }
+      .c3 {
+        width: 50px;
+        height: 50px;
+        background: #ec4899;
+        top: 35px;
+        left: 35px;
+      }
 
-    .empty-emoji {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2.5rem;
-    }
+      .empty-emoji {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.5rem;
+      }
 
-    .empty-title {
-      margin: 0 0 0.5rem;
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: #1a0f2e;
-    }
+      .empty-title {
+        margin: 0 0 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1a0f2e;
+      }
 
-    .empty-sub {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #9ca3af;
-      max-width: 220px;
-    }
+      .empty-sub {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #9ca3af;
+        max-width: 220px;
+      }
 
-    ion-fab-button {
-      --background: linear-gradient(135deg, #7c3aed, #a855f7);
-      --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
-      margin-bottom: env(safe-area-inset-bottom);
-    }
-  `],
+      ion-fab-button {
+        --background: linear-gradient(135deg, #7c3aed, #a855f7);
+        --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+        margin-bottom: env(safe-area-inset-bottom);
+      }
+    `
+  ],
   imports: [
-    IonContent, IonGrid, IonRow, IonCol,
-    QuizCardComponent, IonFab, IonFabButton, IonIcon,
+    IonContent,
+    IonGrid,
+    IonRow,
+    IonCol,
+    QuizCardComponent,
+    IonFab,
+    IonFabButton,
+    IonIcon,
     PageHeaderComponent
   ]
 })

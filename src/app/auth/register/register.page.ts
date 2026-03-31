@@ -9,14 +9,18 @@ import {
   Validators
 } from '@angular/forms'
 import { AuthService } from 'src/app/services/auth.service'
-import { IonButton, IonContent, IonInput, IonIcon } from '@ionic/angular/standalone'
+import {
+  IonButton,
+  IonContent,
+  IonInput,
+  IonIcon
+} from '@ionic/angular/standalone'
 import { RouterLink } from '@angular/router'
 
 @Component({
   selector: 'app-register',
   template: `
     <ion-content [fullscreen]="true" class="register-content">
-
       <div class="hero">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
@@ -94,119 +98,144 @@ import { RouterLink } from '@angular/router'
           Already have an account? <a routerLink="/login">Sign in</a>
         </p>
       </div>
-
     </ion-content>
   `,
-  styles: [`
-    .register-content {
-      --background: #f8f5ff;
-    }
+  styles: [
+    `
+      .register-content {
+        --background: #f8f5ff;
+      }
 
-    .hero {
-      background: linear-gradient(150deg, #6d28d9 0%, #7c3aed 50%, #ec4899 100%);
-      padding: 3rem 2rem 4.5rem;
-      position: relative;
-      overflow: hidden;
-    }
+      .hero {
+        background: linear-gradient(
+          150deg,
+          #6d28d9 0%,
+          #7c3aed 50%,
+          #ec4899 100%
+        );
+        padding: 3rem 2rem 4.5rem;
+        position: relative;
+        overflow: hidden;
+      }
 
-    .blob {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.07);
-    }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.07);
+      }
 
-    .blob-1 { width: 180px; height: 180px; top: -50px; right: -50px; }
-    .blob-2 { width: 120px; height: 120px; bottom: -20px; left: -20px; }
+      .blob-1 {
+        width: 180px;
+        height: 180px;
+        top: -50px;
+        right: -50px;
+      }
+      .blob-2 {
+        width: 120px;
+        height: 120px;
+        bottom: -20px;
+        left: -20px;
+      }
 
-    .hero-text {
-      position: relative;
-      text-align: center;
-    }
+      .hero-text {
+        position: relative;
+        text-align: center;
+      }
 
-    .hero-emoji { font-size: 2.8rem; display: block; margin-bottom: 0.4rem; }
+      .hero-emoji {
+        font-size: 2.8rem;
+        display: block;
+        margin-bottom: 0.4rem;
+      }
 
-    .hero-title {
-      margin: 0;
-      font-size: 2.4rem;
-      font-weight: 900;
-      color: #ffffff;
-    }
+      .hero-title {
+        margin: 0;
+        font-size: 2.4rem;
+        font-weight: 900;
+        color: #ffffff;
+      }
 
-    .hero-sub {
-      margin: 0.3rem 0 0;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.95rem;
-    }
+      .hero-sub {
+        margin: 0.3rem 0 0;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+      }
 
-    .form-card {
-      background: #ffffff;
-      border-radius: 28px 28px 0 0;
-      margin-top: -2rem;
-      padding: 2rem 1.5rem 2.5rem;
-      min-height: 65vh;
-      box-shadow: 0 -4px 30px rgba(124, 58, 237, 0.12);
-    }
+      .form-card {
+        background: #ffffff;
+        border-radius: 28px 28px 0 0;
+        margin-top: -2rem;
+        padding: 2rem 1.5rem 2.5rem;
+        min-height: 65vh;
+        box-shadow: 0 -4px 30px rgba(124, 58, 237, 0.12);
+      }
 
-    .form-title {
-      margin: 0 0 0.25rem;
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: #1a0f2e;
-    }
+      .form-title {
+        margin: 0 0 0.25rem;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1a0f2e;
+      }
 
-    .form-sub {
-      margin: 0 0 1.5rem;
-      color: #9ca3af;
-      font-size: 0.875rem;
-    }
+      .form-sub {
+        margin: 0 0 1.5rem;
+        color: #9ca3af;
+        font-size: 0.875rem;
+      }
 
-    .input-group {
-      margin-bottom: 0.875rem;
-    }
+      .input-group {
+        margin-bottom: 0.875rem;
+      }
 
-    .input-label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #4b5563;
-      margin-bottom: 0.3rem;
-    }
+      .input-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.3rem;
+      }
 
-    .styled-input {
-      --border-radius: 12px;
-      --border-color: #e5e7eb;
-      --highlight-color-focused: #7c3aed;
-      --color: #1a0f2e;
-      --placeholder-color: #d1d5db;
-      --background: #fafafa;
-    }
+      .styled-input {
+        --border-radius: 12px;
+        --border-color: #e5e7eb;
+        --highlight-color-focused: #7c3aed;
+        --color: #1a0f2e;
+        --placeholder-color: #d1d5db;
+        --background: #fafafa;
+      }
 
-    .register-btn {
-      --background: linear-gradient(135deg, #7c3aed, #a855f7);
-      --background-activated: linear-gradient(135deg, #6d33d1, #944cd9);
-      --border-radius: 14px;
-      --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
-      height: 52px;
-      font-weight: 700;
-      margin-top: 0.75rem;
-    }
+      .register-btn {
+        --background: linear-gradient(135deg, #7c3aed, #a855f7);
+        --background-activated: linear-gradient(135deg, #6d33d1, #944cd9);
+        --border-radius: 14px;
+        --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+        height: 52px;
+        font-weight: 700;
+        margin-top: 0.75rem;
+      }
 
-    .switch-text {
-      text-align: center;
-      margin: 1.5rem 0 0;
-      color: #9ca3af;
-      font-size: 0.9rem;
-    }
+      .switch-text {
+        text-align: center;
+        margin: 1.5rem 0 0;
+        color: #9ca3af;
+        font-size: 0.9rem;
+      }
 
-    .switch-text a {
-      color: #7c3aed;
-      font-weight: 700;
-      text-decoration: none;
-    }
-  `],
+      .switch-text a {
+        color: #7c3aed;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    `
+  ],
   imports: [
-    IonButton, IonContent, IonInput, IonIcon,
-    CommonModule, ReactiveFormsModule, RouterLink
+    IonButton,
+    IonContent,
+    IonInput,
+    IonIcon,
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink
   ]
 })
 export class RegisterPage {
@@ -232,9 +261,13 @@ export class RegisterPage {
 
 export function passwordConfirmMatchPasswordValidator(): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const controls = control.parent?.controls as { [key: string]: AbstractControl | null }
+    const controls = control.parent?.controls as {
+      [key: string]: AbstractControl | null
+    }
     const password = controls ? controls['password']?.value : null
     const passwordConfirm = control?.value
-    return passwordConfirm === password ? null : { passwordConfirmMissmatch: true }
+    return passwordConfirm === password
+      ? null
+      : { passwordConfirmMissmatch: true }
   }
 }

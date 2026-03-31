@@ -32,23 +32,25 @@ import { Router } from '@angular/router'
       </ion-toolbar>
     </ion-header>
   `,
-  styles: [`
-    ion-toolbar {
-      --background: #ffffff;
-      --border-color: rgba(124, 58, 237, 0.08);
-    }
+  styles: [
+    `
+      ion-toolbar {
+        --background: #ffffff;
+        --border-color: rgba(124, 58, 237, 0.08);
+      }
 
-    .header-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      color: #1a0f2e;
-      letter-spacing: -0.2px;
-    }
+      .header-title {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #1a0f2e;
+        letter-spacing: -0.2px;
+      }
 
-    .logout-btn {
-      --color: #9ca3af;
-    }
-  `],
+      .logout-btn {
+        --color: #9ca3af;
+      }
+    `
+  ],
   imports: [IonHeader, IonToolbar, IonButtons, IonButton, IonTitle, IonIcon]
 })
 export class PageHeaderComponent {
