@@ -32,6 +32,10 @@ export class UserService {
     })
   }
 
+  createFromGoogle(uid: string, alias: string, email: string) {
+    return setDoc(doc(this.firestore, `users/${uid}`), { alias, email })
+  }
+
   getAll() {
     return collectionData(this.usersCollection, {
       idField: 'id'

@@ -16,7 +16,9 @@ import {
   IonIcon
 } from '@ionic/angular/standalone'
 import { AuthService } from 'src/app/services/auth.service'
-import { RouterLink } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { filter } from 'rxjs'
 import { addIcons } from 'ionicons'
 import { logoGoogle } from 'ionicons/icons'
 
@@ -125,6 +127,17 @@ addIcons({ logoGoogle })
 export class LoginPage {
   private readonly fb = inject(FormBuilder)
   private readonly authService = inject(AuthService)
+  private readonly router = inject(Router)
+
+  constructor() {
+    this.authService
+      .getConnectedUser()
+      .pipe(
+        filter((u) => !!u),
+        takeUntilDestroyed()
+      )
+      .subscribe(() => this.router.navigateByUrl('/'))
+  }
 
   loginForm = this.fb.group({
     identifier: ['', Validators.required],
