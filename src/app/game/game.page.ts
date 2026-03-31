@@ -21,7 +21,7 @@ import { GameScoreboardComponent } from './game-scoreboard.component'
 import { QuizService } from '../services/quiz.service'
 
 import { UserService } from '../services/user.service'
-
+import { NetworkBannerComponent } from '../components/network-banner.component'
 const QUESTION_TIME_SEC = 20
 
 @Component({
