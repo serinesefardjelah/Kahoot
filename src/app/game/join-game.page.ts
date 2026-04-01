@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'
+import { Component, inject, OnDestroy, signal } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
@@ -99,7 +99,7 @@ import { Html5Qrcode } from 'html5-qrcode'
     IonIcon
   ]
 })
-export class JoinGamePage {
+export class JoinGamePage implements OnDestroy {
   private readonly gameService = inject(GameService)
   private readonly authService = inject(AuthService)
   private readonly userService = inject(UserService)
@@ -109,6 +109,10 @@ export class JoinGamePage {
   code = ''
   loading = false
   errorMessage = ''
+
+  ngOnDestroy() {
+    this.stopScan()
+  }
 
   onCodeInput(event: CustomEvent) {
     this.code = (event.detail.value ?? '').toUpperCase()
@@ -182,6 +186,45 @@ export class JoinGamePage {
   readonly isScanning = signal(false)
   private html5QrCode?: Html5Qrcode
 
+  // async scanQrCode() {
+  //   if (this.isScanning()) {
+  //     await this.stopScan()
+  //     return
+  //   }
+
+  //   this.isScanning.set(true)
+
+  //   this.html5QrCode = new Html5Qrcode('qr-reader')
+
+  //   try {
+  //     await this.html5QrCode.start(
+  //       { facingMode: 'environment' }, // back camera
+  //       { fps: 10, qrbox: { width: 250, height: 250 } },
+  //       (decodedText) => {
+  //         // Success callback
+  //         this.stopScan()
+
+  //         const match = decodedText.match(/\/game\/([a-zA-Z0-9]+)/)
+  //         if (match) {
+  //           this.router.navigateByUrl(`/game/${match[1]}`)
+  //           return
+  //         }
+
+  //         const codeMatch = decodedText.match(/[A-Z0-9]{4}/)
+  //         if (codeMatch) {
+  //           this.code = codeMatch[0]
+  //         }
+  //       },
+  //       () => {} // error callback — ignore per-frame errors
+  //     )
+  //   } catch (err) {
+  //     console.error(err)
+  //     this.isScanning.set(false)
+  //     this.errorMessage =
+  //       'Could not access camera. Please allow camera permission.'
+  //   }
+  // }
+
   async scanQrCode() {
     if (this.isScanning()) {
       await this.stopScan()
@@ -190,14 +233,16 @@ export class JoinGamePage {
 
     this.isScanning.set(true)
 
+    // Wait for Angular to render the #qr-reader div
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
     this.html5QrCode = new Html5Qrcode('qr-reader')
 
     try {
       await this.html5QrCode.start(
-        { facingMode: 'environment' }, // back camera
+        { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 250, height: 250 } },
         (decodedText) => {
-          // Success callback
           this.stopScan()
 
           const match = decodedText.match(/\/game\/([a-zA-Z0-9]+)/)
@@ -211,7 +256,7 @@ export class JoinGamePage {
             this.code = codeMatch[0]
           }
         },
-        () => {} // error callback — ignore per-frame errors
+        () => {}
       )
     } catch (err) {
       console.error(err)
@@ -220,7 +265,6 @@ export class JoinGamePage {
         'Could not access camera. Please allow camera permission.'
     }
   }
-
   async stopScan() {
     try {
       await this.html5QrCode?.stop()
