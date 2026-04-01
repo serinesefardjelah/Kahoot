@@ -32,6 +32,7 @@ import {
   PopoverController,
   IonPopover
 } from '@ionic/angular/standalone'
+import { TitleCasePipe } from '@angular/common'
 import { QuizService } from '../services/quiz.service'
 
 import { addIcons } from 'ionicons'
@@ -40,7 +41,8 @@ import {
   saveOutline,
   add,
   ellipsisVerticalOutline,
-  createOutline
+  createOutline,
+  helpCircleOutline
 } from 'ionicons/icons'
 import { Router, RouterLink } from '@angular/router'
 import { Quiz } from '../models/quiz'
@@ -155,6 +157,14 @@ export class QuizPageToolbarComponent {
   }
 }
 
+const CARD_GRADIENTS = [
+  'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+  'linear-gradient(135deg, #6d28d9 0%, #ec4899 100%)',
+  'linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)',
+  'linear-gradient(135deg, #5b21b6 0%, #a855f7 100%)',
+  'linear-gradient(135deg, #7c3aed 0%, #db2777 100%)'
+]
+
 @Component({
   selector: 'app-quiz',
   template: `
@@ -168,7 +178,7 @@ export class QuizPageToolbarComponent {
       />
     </app-page-header>
 
-    <ion-content [fullscreen]="true">
+    <ion-content [fullscreen]="true" class="quiz-content">
       <app-page-header collapse="condense">
         <app-quiz-page-toolbar
           [quizForm]="quizForm"
@@ -177,36 +187,183 @@ export class QuizPageToolbarComponent {
         />
       </app-page-header>
 
-      <div id="container">
-        <ion-list lines="none">
-          <ion-item>
-            <ion-textarea
-              aria-label="Description"
-              [field]="quizForm.description"
-              placeholder="Enter the quiz description here"
-            ></ion-textarea>
-          </ion-item>
-        </ion-list>
-        <ion-list lines="none">
-          @for (question of quiz.questions; track $index) {
-            <ion-item>
-              <ion-label>{{ question.text }} </ion-label>
-            </ion-item>
-          }
-        </ion-list>
+      <!-- Hero banner -->
+      <div class="quiz-hero" [style.background]="heroGradient()">
+        <div class="hero-icon">📋</div>
+        <h1 class="hero-title">{{ quiz.title | titlecase }}</h1>
+        @if (quiz.description) {
+          <p class="hero-desc">{{ quiz.description }}</p>
+        }
+        <span class="hero-badge">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          {{ quiz.questions.length }}
+          question{{ quiz.questions.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+
+      <!-- Questions -->
+      <div class="questions-section">
+        <p class="section-label">Questions</p>
+
+        @if (!quiz.questions.length) {
+          <div class="empty-questions">
+            <p>No questions yet — tap Edit to add some.</p>
+          </div>
+        }
+
+        @for (question of quiz.questions; track question.id; let i = $index) {
+          <div class="question-card">
+            <div class="question-header">
+              <span class="question-num">Q{{ i + 1 }}</span>
+              <p class="question-text">{{ question.text }}</p>
+            </div>
+            <div class="choices-grid">
+              @for (choice of question.choices; track $index) {
+                <div class="choice">{{ choice.text }}</div>
+              }
+            </div>
+          </div>
+        }
       </div>
     </ion-content>
   `,
-  styles: [``],
+  styles: [
+    `
+      .quiz-content {
+        --background: #f8f5ff;
+      }
+
+      /* Hero */
+      .quiz-hero {
+        padding: 2rem 1.5rem 2.5rem;
+        text-align: center;
+        border-radius: 0 0 28px 28px;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero-icon {
+        width: 68px;
+        height: 68px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+      }
+
+      .hero-title {
+        margin: 0 0 0.4rem;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .hero-desc {
+        margin: 0 0 0.9rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 14px;
+        border-radius: 100px;
+      }
+
+      /* Questions */
+      .questions-section {
+        padding: 0 1rem 5rem;
+      }
+
+      .section-label {
+        margin: 0 0.25rem 0.75rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+      }
+
+      .question-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1rem 1rem 0.75rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 2px 12px rgba(124, 58, 237, 0.08);
+      }
+
+      .question-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .question-num {
+        flex-shrink: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .question-text {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1a0f2e;
+        line-height: 1.4;
+        flex: 1;
+        padding-top: 0.3rem;
+      }
+
+      .choices-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+
+      .choice {
+        background: #f8f5ff;
+        border: 1.5px solid #e9d8fd;
+        border-radius: 10px;
+        padding: 0.5rem 0.6rem;
+        font-size: 0.82rem;
+        color: #4b5563;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .empty-questions {
+        text-align: center;
+        padding: 2rem;
+        color: #9ca3af;
+        font-size: 0.9rem;
+      }
+    `
+  ],
   imports: [
     IonContent,
-    IonTextarea,
-    IonList,
-    IonItem,
-    IonLabel,
-    Field,
+    IonIcon,
     QuizPageToolbarComponent,
-    PageHeaderComponent
+    PageHeaderComponent,
+    TitleCasePipe
   ]
 })
 export class QuizPage {
@@ -234,8 +391,14 @@ export class QuizPage {
 
   quiz = computed(() => this.quizResource.value())
 
+  readonly heroGradient = computed(() => {
+    const title = this.quiz().title ?? ''
+    const index = title.charCodeAt(0) % CARD_GRADIENTS.length
+    return CARD_GRADIENTS[index]
+  })
+
   constructor() {
-    addIcons({ trashOutline, saveOutline, add })
+    addIcons({ trashOutline, saveOutline, add, helpCircleOutline })
   }
 
   async openCreateQuestionModal() {}
