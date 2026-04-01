@@ -151,7 +151,21 @@ export class GamePage implements OnInit, OnDestroy {
   })
 
   constructor() {
-    // When game loads, register the player if they're not the host
+    // Auto-register player when they land on game page (e.g. via QR code)
+    effect(async () => {
+      const game = this.gameResource.value()
+      const user = this.connectedUser()
+      if (!game || !user) return
+      if (game.hostId === user.uid) return // don't register host as player
+      if (game.status !== 'waiting') return // only join during lobby
+
+      const users = await firstValueFrom(this.userService.getAll())
+      const userWithAlias = users.find((u) => u.uid === user.uid)
+      const alias = userWithAlias?.alias ?? user.email ?? 'Anonymous'
+      await this.gameService.joinGame(game.id, { uid: user.uid, alias })
+    })
+
+    // Compute scores when results or finished
     effect(() => {
       const game = this.gameResource.value()
       if (!game) return

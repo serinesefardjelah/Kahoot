@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router } from '@angular/router'
 import { ActivatedRoute } from '@angular/router'
@@ -16,10 +16,9 @@ import { PageHeaderComponent } from '../components/page-header'
 import { GameService } from '../services/game.service'
 import { AuthService } from '../services/auth.service'
 import { UserService } from '../services/user.service'
-import { qrCodeOutline } from 'ionicons/icons'
-import { BarcodeScanner } from '@capacitor-mlkit/barcode-scanning'
+import { closeOutline, qrCodeOutline } from 'ionicons/icons'
 import { addIcons } from 'ionicons'
-
+import { Html5Qrcode } from 'html5-qrcode'
 @Component({
   selector: 'app-join-game',
   template: `
@@ -42,9 +41,20 @@ import { addIcons } from 'ionicons'
           style="width:100%;max-width:300px"
           (click)="scanQrCode()"
         >
-          <ion-icon slot="start" name="qr-code-outline"></ion-icon>
-          Scan QR Code
+          <ion-icon
+            slot="start"
+            [name]="isScanning() ? 'close-outline' : 'qr-code-outline'"
+          ></ion-icon>
+          {{ isScanning() ? 'Stop Scan' : 'Scan QR Code' }}
         </ion-button>
+
+        <!-- Scanner viewport — only shown while scanning -->
+        @if (isScanning()) {
+          <div
+            id="qr-reader"
+            style="width:100%;max-width:300px;border-radius:12px;overflow:hidden;margin-top:0.5rem"
+          ></div>
+        }
         <ion-input
           fill="outline"
           label="Entry Code"
@@ -160,7 +170,7 @@ export class JoinGamePage {
 
   constructor() {
     // Auto-fill code if coming from QR scan
-    addIcons({ qrCodeOutline })
+    addIcons({ qrCodeOutline, closeOutline })
 
     this.route.queryParams.subscribe((params) => {
       if (params['code']) {
@@ -168,33 +178,54 @@ export class JoinGamePage {
       }
     })
   }
+
+  readonly isScanning = signal(false)
+  private html5QrCode?: Html5Qrcode
+
   async scanQrCode() {
-    try {
-      const { barcodes } = await BarcodeScanner.scan({
-        formats: [{ format: 'QR_CODE' } as any]
-      })
-
-      if (!barcodes.length) return
-
-      const raw = barcodes[0].rawValue // e.g. "https://kahoot-aaa4f.web.app/game/Ehi0PKPpJQGZlGd3xFYO"
-      if (!raw) return
-      // Extract the gameId from the URL
-      const match = raw.match(/\/game\/([a-zA-Z0-9]+)/)
-      if (match) {
-        // Navigate directly to game page — auto-join effect will handle registration
-        this.router.navigateByUrl(`/game/${match[1]}`)
-        return
-      }
-
-      // Fallback: try to extract a 4-char entry code
-      const codeMatch = raw.match(/[A-Z0-9]{4}/)
-      if (codeMatch) {
-        this.code = codeMatch[0]
-      }
-    } catch (err) {
-      console.error('Scan failed', err)
-      this.errorMessage =
-        'Scan failed. Please try again or enter the code manually.'
+    if (this.isScanning()) {
+      await this.stopScan()
+      return
     }
+
+    this.isScanning.set(true)
+
+    this.html5QrCode = new Html5Qrcode('qr-reader')
+
+    try {
+      await this.html5QrCode.start(
+        { facingMode: 'environment' }, // back camera
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          // Success callback
+          this.stopScan()
+
+          const match = decodedText.match(/\/game\/([a-zA-Z0-9]+)/)
+          if (match) {
+            this.router.navigateByUrl(`/game/${match[1]}`)
+            return
+          }
+
+          const codeMatch = decodedText.match(/[A-Z0-9]{4}/)
+          if (codeMatch) {
+            this.code = codeMatch[0]
+          }
+        },
+        () => {} // error callback — ignore per-frame errors
+      )
+    } catch (err) {
+      console.error(err)
+      this.isScanning.set(false)
+      this.errorMessage =
+        'Could not access camera. Please allow camera permission.'
+    }
+  }
+
+  async stopScan() {
+    try {
+      await this.html5QrCode?.stop()
+      this.html5QrCode?.clear()
+    } catch {}
+    this.isScanning.set(false)
   }
 }

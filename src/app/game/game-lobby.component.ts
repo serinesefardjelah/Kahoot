@@ -145,7 +145,9 @@ export class GameLobbyComponent {
   // OR we can encode the code directly in the URL if join-game supports it
 
   qrUrl() {
-    const joinUrl = `https://kahoot-aaa4f.web.app/game/${this.gameId()}`
+    // const joinUrl = `https://kahoot-aaa4f.web.app/game/${this.gameId()}`
+    const joinUrl = `https://kahoot-aaa4f--preview-jnhzdepd.web.app/game/${this.gameId()}`
+
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(joinUrl)}`
   }
 
