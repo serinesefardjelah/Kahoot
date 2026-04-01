@@ -1,11 +1,10 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core'
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms'
-import { Router } from '@angular/router'
-import { ActivatedRoute } from '@angular/router'
+import { Component, inject, OnDestroy, signal, ViewChild, ElementRef } from '@angular/core'
+import { FormBuilder, ReactiveFormsModule, Validators, ReactiveFormsModule } from '@angular/forms'
+import { Router, ActivatedRoute } from '@angular/router'
+import { Component, inject,  } from '@angular/core'
 import { firstValueFrom } from 'rxjs'
 import {
   IonContent,
-  IonInput,
   IonButton,
   IonSpinner,
   IonText,
@@ -22,10 +21,10 @@ import { Html5Qrcode } from 'html5-qrcode'
 @Component({
   selector: 'app-join-game',
   template: `
-    <app-page-header [translucent]="true">Join Game</app-page-header>
+    <app-page-header [translucent]="true">Join a Game</app-page-header>
 
-    <ion-content [fullscreen]="true" class="ion-padding">
-      <app-page-header collapse="condense">Join Game</app-page-header>
+    <ion-content [fullscreen]="true" class="join-content">
+      <app-page-header collapse="condense">Join a Game</app-page-header>
 
       <div
         style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding-top:1rem"
@@ -108,6 +107,7 @@ import { Html5Qrcode } from 'html5-qrcode'
         <ion-button
           expand="block"
           style="width:100%;max-width:300px"
+          class="join-btn"
           [disabled]="code.length < 4 || loading"
           (click)="joinGame()"
         >
@@ -121,9 +121,132 @@ import { Html5Qrcode } from 'html5-qrcode'
       </div>
     </ion-content>
   `,
+  styles: [
+    `
+      .join-content {
+        --background: #f8f5ff;
+      }
+
+      .join-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80%;
+        padding: 2rem 1.5rem;
+        gap: 1.75rem;
+      }
+
+      /* Hero */
+      .join-hero {
+        text-align: center;
+      }
+
+      .hero-badge {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #7c3aed, #a855f7);
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        margin: 0 auto 1rem;
+        box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3);
+      }
+
+      .hero-title {
+        margin: 0 0 0.4rem;
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #1a0f2e;
+      }
+
+      .hero-sub {
+        margin: 0;
+        color: #9ca3af;
+        font-size: 0.875rem;
+      }
+
+      /* 4 code boxes */
+      .code-area-wrap {
+        position: relative;
+      }
+
+      .code-boxes {
+        display: flex;
+        gap: 0.75rem;
+        pointer-events: none;
+      }
+
+      .code-box {
+        width: 64px;
+        height: 72px;
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 900;
+        color: #7c3aed;
+        background: #ffffff;
+        transition:
+          border-color 0.2s,
+          background 0.2s,
+          transform 0.15s;
+        box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06);
+      }
+
+      .code-box.filled {
+        border-color: #7c3aed;
+        background: #f3eeff;
+      }
+
+      .code-box.active {
+        border-color: #a855f7;
+        box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+        transform: scale(1.05);
+      }
+
+      /* Hidden real input — covers the code boxes, no pointer-events:none so mobile backspace works */
+      .hidden-input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        border: none;
+        outline: none;
+        cursor: text;
+        z-index: 1;
+        font-size: 16px; /* prevents iOS auto-zoom on focus */
+      }
+
+      .tap-hint {
+        margin: -0.75rem 0 0;
+        font-size: 0.78rem;
+        color: #c4b5fd;
+      }
+
+      .error-msg {
+        margin: 0;
+        text-align: center;
+        font-size: 0.875rem;
+      }
+
+      .join-btn {
+        --background: linear-gradient(135deg, #7c3aed, #a855f7);
+        --background-activated: linear-gradient(135deg, #6d33d1, #944cd9);
+        --border-radius: 14px;
+        --box-shadow: 0 6px 20px rgba(124, 58, 237, 0.35);
+        height: 52px;
+        font-weight: 700;
+        width: 100%;
+        max-width: 320px;
+      }
+    `
+  ],
   imports: [
     IonContent,
-    IonInput,
     IonButton,
     IonSpinner,
     IonText,
@@ -133,11 +256,14 @@ import { Html5Qrcode } from 'html5-qrcode'
   ]
 })
 export class JoinGamePage implements OnDestroy {
+  @ViewChild('codeInput') codeInputRef!: ElementRef<HTMLInputElement>
+
   private readonly gameService = inject(GameService)
   private readonly authService = inject(AuthService)
   private readonly userService = inject(UserService)
   private readonly router = inject(Router)
   private readonly toastController = inject(ToastController)
+  private readonly route = inject(ActivatedRoute)
 
   code = ''
   loading = false
@@ -149,55 +275,69 @@ export class JoinGamePage implements OnDestroy {
 
   onCodeInput(event: CustomEvent) {
     this.code = (event.detail.value ?? '').toUpperCase()
+  constructor() {
+    this.route.queryParams.subscribe((params) => {
+      if (params['code']) this.code = params['code'].toUpperCase()
+    })
+  }
+
+  focusInput() {
+    this.codeInputRef?.nativeElement.focus()
+  }
+
+  onInput(event: Event) {
+    const input = event.target as HTMLInputElement
+    // Keep only A-Z letters and 0-9 digits, uppercase, max 4
+    const filtered = input.value
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .slice(0, 4)
+    this.code = filtered
+    input.value = filtered
     this.errorMessage = ''
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && this.code.length === 4) {
+      this.joinGame()
+    }
   }
 
   async joinGame() {
     if (this.code.length < 4) return
-
     this.loading = true
     this.errorMessage = ''
-
     try {
-      // 1. Get the connected user
       const user = await firstValueFrom(this.authService.getConnectedUser())
       if (!user) {
         this.router.navigateByUrl('/login')
         return
       }
 
-      // 2. Get the user's alias from Firestore
       const users = await firstValueFrom(this.userService.getAll())
-      const userWithAlias = users.find((u) => u.uid === user.uid)
-      const alias = userWithAlias?.alias ?? user.email ?? 'Anonymous'
+      const alias =
+        users.find((u) => u.uid === user.uid)?.alias ??
+        user.email ??
+        'Anonymous'
 
-      // 3. Find the game by entry code
       const games = await firstValueFrom(
         this.gameService.getByEntryCode(this.code)
       )
-
       if (!games.length) {
-        this.errorMessage =
-          'No game found with this code. Please check and try again.'
+        this.errorMessage = 'No game found with this code.'
         return
       }
 
-      const game = games[0]
-
-      // 4. Add the player to the game
-      await this.gameService.joinGame(game.id, { uid: user.uid, alias })
-
-      // 5. Navigate to the game lobby
-      this.router.navigateByUrl(`/game/${game.id}`)
-
-      const toast = await this.toastController.create({
-        message: `Joined game successfully!`,
-        duration: 1500,
-        color: 'success'
-      })
-      toast.present()
-    } catch (error) {
-      console.error(error)
+      await this.gameService.joinGame(games[0].id, { uid: user.uid, alias })
+      this.router.navigateByUrl(`/game/${games[0].id}`)
+      ;(
+        await this.toastController.create({
+          message: 'Joined!',
+          duration: 1500,
+          color: 'success'
+        })
+      ).present()
+    } catch (e) {
       this.errorMessage = 'Something went wrong. Please try again.'
     } finally {
       this.loading = false

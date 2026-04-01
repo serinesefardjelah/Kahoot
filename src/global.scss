@@ -1,12 +1,5 @@
 /*
  * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
  */
 
 /* Core CSS required for Ionic components to work properly */
@@ -35,6 +28,19 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+@import "@ionic/angular/css/core.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* Light mode only — dark mode disabled */
+/* @import "@ionic/angular/css/palettes/dark.system.css"; */
 
 a {
   cursor: pointer;
@@ -78,4 +84,39 @@ a {
   img[alt='Camera based scan'] {
     display: none !important;
   }
+
+/* Global button */
+ion-button {
+  --border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+ion-button[expand="block"] {
+  height: 52px;
+}
+
+/* Global card */
+ion-card {
+  border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(124, 58, 237, 0.1);
+}
+
+/* Global toolbar */
+ion-toolbar {
+  --background: #ffffff;
+  --border-color: rgba(124, 58, 237, 0.08);
+}
+
+/* Tab bar */
+ion-tab-bar {
+  --background: #ffffff;
+  border-top: 1px solid rgba(124, 58, 237, 0.08);
+  box-shadow: 0 -4px 20px rgba(124, 58, 237, 0.06);
+}
+
+/* Gradient utility */
+.purple-gradient {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
 }

@@ -1,2 +1,106 @@
-// For information on how to create your own theme, please refer to:
-// https://ionicframework.com/docs/theming/
+// Light mode — Mauve / Violet theme
+
+:root {
+  /* App background */
+  --ion-background-color: #f8f5ff;
+  --ion-background-color-rgb: 248, 245, 255;
+
+  /* Text */
+  --ion-text-color: #1a0f2e;
+  --ion-text-color-rgb: 26, 15, 46;
+
+  /* Surfaces */
+  --ion-toolbar-background: #ffffff;
+  --ion-toolbar-border-color: rgba(124, 58, 237, 0.1);
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+  --ion-tab-bar-background: #ffffff;
+  --ion-tab-bar-border-color: rgba(124, 58, 237, 0.1);
+
+  /* Primary — violet */
+  --ion-color-primary: #7c3aed;
+  --ion-color-primary-rgb: 124, 58, 237;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #6d33d1;
+  --ion-color-primary-tint: #8a4eef;
+
+  /* Secondary — lighter purple */
+  --ion-color-secondary: #a855f7;
+  --ion-color-secondary-rgb: 168, 85, 247;
+  --ion-color-secondary-contrast: #ffffff;
+  --ion-color-secondary-contrast-rgb: 255, 255, 255;
+  --ion-color-secondary-shade: #944cd9;
+  --ion-color-secondary-tint: #b166f8;
+
+  /* Tertiary — pink mauve */
+  --ion-color-tertiary: #ec4899;
+  --ion-color-tertiary-rgb: 236, 72, 153;
+  --ion-color-tertiary-contrast: #ffffff;
+  --ion-color-tertiary-contrast-rgb: 255, 255, 255;
+  --ion-color-tertiary-shade: #d04187;
+  --ion-color-tertiary-tint: #ee5aa3;
+
+  --ion-color-success: #10b981;
+  --ion-color-success-rgb: 16, 185, 129;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #0ea371;
+  --ion-color-success-tint: #28c08d;
+
+  --ion-color-warning: #f59e0b;
+  --ion-color-warning-rgb: 245, 158, 11;
+  --ion-color-warning-contrast: #000000;
+  --ion-color-warning-contrast-rgb: 0, 0, 0;
+  --ion-color-warning-shade: #d88b09;
+  --ion-color-warning-tint: #f6a823;
+
+  --ion-color-danger: #ef4444;
+  --ion-color-danger-rgb: 239, 68, 68;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #d23c3c;
+  --ion-color-danger-tint: #f15757;
+
+  --ion-color-medium: #9ca3af;
+  --ion-color-medium-rgb: 156, 163, 175;
+  --ion-color-medium-contrast: #000000;
+  --ion-color-medium-contrast-rgb: 0, 0, 0;
+  --ion-color-medium-shade: #898f9a;
+  --ion-color-medium-tint: #a6acb7;
+
+  --ion-color-light: #f3eeff;
+  --ion-color-light-rgb: 243, 238, 255;
+  --ion-color-light-contrast: #1a0f2e;
+  --ion-color-light-contrast-rgb: 26, 15, 46;
+  --ion-color-light-shade: #d6d1e1;
+  --ion-color-light-tint: #f5f0ff;
+
+  --ion-color-dark: #1a0f2e;
+  --ion-color-dark-rgb: 26, 15, 46;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #170e29;
+  --ion-color-dark-tint: #312049;
+
+  /* Color steps — light purple scale */
+  --ion-color-step-50: #f3eeff;
+  --ion-color-step-100: #e9e0ff;
+  --ion-color-step-150: #ddd1ff;
+  --ion-color-step-200: #d1c2ff;
+  --ion-color-step-250: #c5b3ff;
+  --ion-color-step-300: #b9a4ff;
+  --ion-color-step-350: #ad94ff;
+  --ion-color-step-400: #a185ff;
+  --ion-color-step-450: #9576f5;
+  --ion-color-step-500: #8967eb;
+  --ion-color-step-550: #7c58e1;
+  --ion-color-step-600: #7049d7;
+  --ion-color-step-650: #6439cd;
+  --ion-color-step-700: #582ac3;
+  --ion-color-step-750: #4c1bb9;
+  --ion-color-step-800: #400caf;
+  --ion-color-step-850: #3400a5;
+  --ion-color-step-900: #28009b;
+  --ion-color-step-950: #1c0091;
+}
