@@ -28,11 +28,9 @@ import { Html5Qrcode } from 'html5-qrcode'
       <app-page-header collapse="condense">Join Game</app-page-header>
 
       <div
-        style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60%; gap: 1.5rem;"
+        style="display:flex;flex-direction:column;align-items:center;gap:1.5rem;padding-top:1rem"
       >
-        <p
-          style="color: var(--ion-color-medium); text-align: center; margin: 0"
-        >
+        <p style="color:var(--ion-color-medium);text-align:center;margin:0">
           Enter the 4-character code shared by the host
         </p>
 
@@ -45,36 +43,71 @@ import { Html5Qrcode } from 'html5-qrcode'
             slot="start"
             [name]="isScanning() ? 'close-outline' : 'qr-code-outline'"
           ></ion-icon>
-          {{ isScanning() ? 'Stop Scan' : 'Scan QR Code' }}
+          {{ isScanning() ? 'Stop Scann' : 'Scan QR Code' }}
         </ion-button>
 
-        <!-- Scanner viewport — only shown while scanning -->
         @if (isScanning()) {
           <div
-            id="qr-reader"
-            style="width:100%;max-width:300px;border-radius:12px;overflow:hidden;margin-top:0.5rem"
-          ></div>
+            style="
+          width: calc(100vw - 32px);
+          max-width: 500px;
+          position: relative;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #000;
+          aspect-ratio: 1;
+        "
+          >
+            <video
+              id="qr-video"
+              playsinline
+              muted
+              style="width:100%;height:100%;object-fit:cover;display:block"
+            ></video>
+            <canvas id="qr-canvas" style="display:none"></canvas>
+            <div
+              style="
+            position:absolute;
+            top:50%;left:50%;
+            transform:translate(-50%,-50%);
+            width:60%;height:60%;
+            border:3px solid var(--ion-color-primary);
+            border-radius:12px;
+            box-shadow:0 0 0 9999px rgba(0,0,0,0.5)
+          "
+            ></div>
+            <p
+              style="
+            position:absolute;bottom:12px;
+            width:100%;text-align:center;
+            color:white;font-size:0.85rem;margin:0
+          "
+            >
+              Point at the QR code
+            </p>
+          </div>
         }
+
         <ion-input
           fill="outline"
           label="Entry Code"
           labelPlacement="floating"
           placeholder="AB12"
           [maxlength]="4"
-          style="width: 100%; max-width: 300px; font-size: 2rem; text-align: center; letter-spacing: 0.5rem; text-transform: uppercase;"
+          style="width:100%;max-width:300px;font-size:2rem;text-align:center;letter-spacing:0.5rem;text-transform:uppercase"
           (ionInput)="onCodeInput($event)"
           [value]="code"
         ></ion-input>
 
         @if (errorMessage) {
           <ion-text color="danger">
-            <p style="margin: 0; text-align: center">{{ errorMessage }}</p>
+            <p style="margin:0;text-align:center">{{ errorMessage }}</p>
           </ion-text>
         }
 
         <ion-button
           expand="block"
-          style="width: 100%; max-width: 300px"
+          style="width:100%;max-width:300px"
           [disabled]="code.length < 4 || loading"
           (click)="joinGame()"
         >
@@ -182,82 +215,57 @@ export class JoinGamePage implements OnDestroy {
       }
     })
   }
-
   readonly isScanning = signal(false)
-  private html5QrCode?: Html5Qrcode
-
-  // async scanQrCode() {
-  //   if (this.isScanning()) {
-  //     await this.stopScan()
-  //     return
-  //   }
-
-  //   this.isScanning.set(true)
-
-  //   this.html5QrCode = new Html5Qrcode('qr-reader')
-
-  //   try {
-  //     await this.html5QrCode.start(
-  //       { facingMode: 'environment' }, // back camera
-  //       { fps: 10, qrbox: { width: 250, height: 250 } },
-  //       (decodedText) => {
-  //         // Success callback
-  //         this.stopScan()
-
-  //         const match = decodedText.match(/\/game\/([a-zA-Z0-9]+)/)
-  //         if (match) {
-  //           this.router.navigateByUrl(`/game/${match[1]}`)
-  //           return
-  //         }
-
-  //         const codeMatch = decodedText.match(/[A-Z0-9]{4}/)
-  //         if (codeMatch) {
-  //           this.code = codeMatch[0]
-  //         }
-  //       },
-  //       () => {} // error callback — ignore per-frame errors
-  //     )
-  //   } catch (err) {
-  //     console.error(err)
-  //     this.isScanning.set(false)
-  //     this.errorMessage =
-  //       'Could not access camera. Please allow camera permission.'
-  //   }
-  // }
+  private videoStream?: MediaStream
+  private scanInterval?: ReturnType<typeof setInterval>
+  private jsQR?: any
 
   async scanQrCode() {
     if (this.isScanning()) {
-      await this.stopScan()
+      this.stopScan()
       return
     }
 
     this.isScanning.set(true)
-
-    // Wait for Angular to render the #qr-reader div
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    this.html5QrCode = new Html5Qrcode('qr-reader')
-
     try {
-      await this.html5QrCode.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          this.stopScan()
+      this.videoStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        }
+      })
 
-          const match = decodedText.match(/\/game\/([a-zA-Z0-9]+)/)
-          if (match) {
-            this.router.navigateByUrl(`/game/${match[1]}`)
-            return
-          }
+      const video = document.getElementById('qr-video') as HTMLVideoElement
+      video.srcObject = this.videoStream
+      await video.play()
 
-          const codeMatch = decodedText.match(/[A-Z0-9]{4}/)
-          if (codeMatch) {
-            this.code = codeMatch[0]
+      // Dynamically import jsQR for decoding
+      const jsQRModule = await import('jsqr')
+      this.jsQR = jsQRModule.default
+
+      const canvas = document.getElementById('qr-canvas') as HTMLCanvasElement
+      const ctx = canvas.getContext('2d')!
+
+      this.scanInterval = setInterval(() => {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth
+          canvas.height = video.videoHeight
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+          const code = this.jsQR(
+            imageData.data,
+            imageData.width,
+            imageData.height
+          )
+          if (code) {
+            this.stopScan()
+            this.handleScannedValue(code.data)
           }
-        },
-        () => {}
-      )
+        }
+      }, 200)
     } catch (err) {
       console.error(err)
       this.isScanning.set(false)
@@ -265,11 +273,23 @@ export class JoinGamePage implements OnDestroy {
         'Could not access camera. Please allow camera permission.'
     }
   }
-  async stopScan() {
-    try {
-      await this.html5QrCode?.stop()
-      this.html5QrCode?.clear()
-    } catch {}
+
+  handleScannedValue(raw: string) {
+    const match = raw.match(/\/game\/([a-zA-Z0-9]+)/)
+    if (match) {
+      this.router.navigateByUrl(`/game/${match[1]}`)
+      return
+    }
+    const codeMatch = raw.match(/[A-Z0-9]{4}/)
+    if (codeMatch) {
+      this.code = codeMatch[0]
+    }
+  }
+
+  stopScan() {
+    clearInterval(this.scanInterval)
+    this.videoStream?.getTracks().forEach((t) => t.stop())
+    this.videoStream = undefined
     this.isScanning.set(false)
   }
 }
